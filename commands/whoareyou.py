@@ -27,14 +27,16 @@ class WhoAreYou(commands.Cog):
             name="My Family",
             value=(
                 "**<@875455409853460550>** is my sister!\n"
-                "**<@312984580745330688>** is my mom!\n"
-		        "**<@252130669919076352>** is my other mom!\n"
-                "We're a happy little family!"
+                "**<@252130669919076352>** is my mom!\n"
+		        "**<@312984580745330688>** is my other mom!\n"
+                "**<@1347210559610814464>** is my... sister... I guess...\n"
+                "We're a happy family!"
             ),
             inline=False
         )
 
-        embed.set_footer(text="Nyaa~! Thanks for asking about me! 🐾", icon_url=ctx.author.avatar.url)
+        embed.set_thumbnail(url=self.bot.user.avatar)
+        embed.set_footer(text="Nyaa~! Thanks " + ctx.author.name + " for asking about me!", icon_url=ctx.author.avatar.url)
 
         await ctx.send(embed=embed)
 
