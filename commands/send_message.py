@@ -13,7 +13,7 @@ class SendMessage(commands.Cog):
         self.bot = bot
 
     @commands.command(hidden=True)
-    async def send_message(self, ctx, server_id: int, channel_id: int, *, message_content: str):
+    async def send_message(self, ctx, server_id: int, channel_id: int, message_id: str, *, message_content: str):
         # Log command usage
         logger.info(f"Command 'send_message' invoked by {ctx.author} (ID: {ctx.author.id}) with server_id={server_id}, channel_id={channel_id}, message_content='{message_content}'")
 
@@ -40,10 +40,16 @@ class SendMessage(commands.Cog):
             return
 
         try:
-            await channel.send(message_content)
-            feedback = f"Message sent to {server.name} in channel {channel.name}."
-            await ctx.send(feedback)
-            logger.info(f"Message sent to server_id={server_id}, channel_id={channel_id}, content='{message_content}'")
+            if message_id != "none": 
+                message = await channel.fetch_message(message_id)
+                await message.reply(message_content)
+                feedback = f"Message sent to {server.name} in channel {channel.name}."
+                await ctx.send(feedback)
+            else:
+                await channel.send(message_content)
+                feedback = f"Message sent to {server.name} in channel {channel.name}."
+                await ctx.send(feedback)
+                logger.info(f"Message sent to server_id={server_id}, channel_id={channel_id}, content='{message_content}'")
         except discord.Forbidden:
             feedback = "I do not have permission to send messages in that channel."
             await ctx.send(feedback)

@@ -38,30 +38,32 @@ async def on_message(message: discord.Message):
     if str(message.author.id) not in sparkles[server_id]:
         sparkles[server_id][str(message.author.id)] = {"epic": 0, "rare": 0, "regular": 0}
 
+    if re.search("Nova", message.content, re.IGNORECASE):
+        await message.reply(f"You called?") #Don't bother her fuckface
+
     # Check for "b" + 2 or more "o"s + "m" (case-insensitive)
     if re.search(r"\bb[o]{2,}m\b", message.content, re.IGNORECASE):
-        await message.add_reaction("💥")  # :boom: emoji
+        await message.add_reaction("💥")
 
-    # Generate a random number between 1 and 100,000
     chance = random.randint(1, 100000)
 
     # Check for epic sparkle reaction (1/100,000 chance)
     if chance == 1:
-        await message.add_reaction("✨")  # Epic sparkle
+        await message.add_reaction("✨")
         await message.reply(f"**{message.author.name}** got an **epic sparkle**! ✨", mention_author=False)
         sparkles[server_id][str(message.author.id)]["epic"] += 1
         save_sparkles(sparkles)  # Save the updated data
 
     # Check for rare sparkle reaction (1/10,000 chance)
     elif chance <= 10:
-        await message.add_reaction("🌟")  # Rare sparkle
+        await message.add_reaction("🌟")
         await message.reply(f"**{message.author.name}** got a **rare sparkle**! 🌟", mention_author=False)
         sparkles[server_id][str(message.author.id)]["rare"] += 1
         save_sparkles(sparkles)  # Save the updated data
 
     # Check for regular sparkle reaction (1/1,000 chance)
     elif chance <= 100:
-        await message.add_reaction("⭐")  # Regular sparkle
+        await message.add_reaction("⭐")
         await message.reply(f"**{message.author.name}** got a **sparkle**! ⭐", mention_author=False)
         sparkles[server_id][str(message.author.id)]["regular"] += 1
         save_sparkles(sparkles)  # Save the updated data
