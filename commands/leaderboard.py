@@ -1,4 +1,3 @@
-# commands/leaderboard.py
 import discord
 from discord.ext import commands
 from discord import app_commands
@@ -33,7 +32,6 @@ class Leaderboard(commands.Cog):
             )
             return
 
-        # Load sparkles data from the JSON file
         sparkles = load_sparkles()
 
         # Get the server's sparkle data
@@ -76,9 +74,6 @@ class Leaderboard(commands.Cog):
     async def sparkle_type_autocomplete(
         self, interaction: discord.Interaction, current: str
     ):
-        """
-        Provides autocomplete options for the sparkle_type argument.
-        """
         valid_types = ["epic", "rare", "regular"]
         return [
             app_commands.Choice(name=sparkle_type, value=sparkle_type)

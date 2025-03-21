@@ -1,4 +1,3 @@
-# tasks/daily_reminder.py
 import discord
 from dotenv import load_dotenv
 from os import environ
@@ -10,8 +9,8 @@ class DailyReminder:
     def __init__(self, bot):
         self.bot = bot
         self.girlfriend_id = environ.get("GIRLFRIEND_ID")
-        self.london_tz = pytz.timezone("Europe/London")  # Timezone for London
-        self.daily_reminder.start()  # Start the task when the class is initialized
+        self.london_tz = pytz.timezone("Europe/London")
+        self.daily_reminder.start()
 
     @tasks.loop(minutes=1)  # Check every minute
     async def daily_reminder(self):
@@ -21,9 +20,7 @@ class DailyReminder:
         now = datetime.now(self.london_tz)
         if now.hour == 12  and now.minute == 0:
             try:
-                # Fetch the user object
                 girlfriend = await self.bot.fetch_user(self.girlfriend_id)
-                # Send the DM
                 await girlfriend.send("Daily reminder that Lilac loves you <3", silent=True)
                 print(f"Sent daily reminder to {girlfriend.name} at {now}.")
             except discord.Forbidden:

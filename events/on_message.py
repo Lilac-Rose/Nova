@@ -21,7 +21,9 @@ def save_sparkles(sparkles):
         json.dump(sparkles, f, indent=4)
 
 async def on_message(message: discord.Message):
-    """Handles the on_message event for sparkle reactions and :boom: reactions"""
+    """
+    Handles the on_message event for sparkle reactions and :boom: reactions
+    """
     # Ignore messages from the bot itself and other bots
     if message.author.bot:
         return

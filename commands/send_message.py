@@ -6,7 +6,6 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Your user ID
 MY_USER_ID = 252130669919076352
 
 class SendMessage(commands.Cog):
@@ -18,7 +17,6 @@ class SendMessage(commands.Cog):
         # Log command usage
         logger.info(f"Command 'send_message' invoked by {ctx.author} (ID: {ctx.author.id}) with server_id={server_id}, channel_id={channel_id}, message_content='{message_content}'")
 
-        # Check if the command is being used by you
         if ctx.author.id != MY_USER_ID:
             feedback = "You do not have permission to use this command."
             await ctx.send(feedback)
@@ -41,7 +39,6 @@ class SendMessage(commands.Cog):
             logger.error(f"Channel not found: channel_id={channel_id} in server_id={server_id}")
             return
 
-        # Send the message
         try:
             await channel.send(message_content)
             feedback = f"Message sent to {server.name} in channel {channel.name}."
@@ -56,6 +53,5 @@ class SendMessage(commands.Cog):
             await ctx.send(feedback)
             logger.error(f"Failed to send message: {e}")
 
-# Properly await the add_cog method
 async def setup(bot):
     await bot.add_cog(SendMessage(bot))

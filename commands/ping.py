@@ -1,4 +1,3 @@
-# commands/ping.py
 import discord
 from discord.ext import commands
 
@@ -14,7 +13,6 @@ class Ping(commands.Cog):
         """
         latency = round(self.bot.latency * 1000)  # Convert to milliseconds
 
-        # Create an embed
         embed = discord.Embed(
             title="🏓 Pong!",
             description=f"Delay: **{latency}ms**",

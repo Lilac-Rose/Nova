@@ -14,7 +14,6 @@ class ForceSparkle(commands.Cog):
         if ctx.author.bot:
             return
 
-        # Validate reaction type
         valid_reactions = {
             "epic": "✨",
             "rare": "🌟",

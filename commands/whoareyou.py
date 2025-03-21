@@ -1,4 +1,3 @@
-# commands/whoareyou.py
 import discord
 from discord.ext import commands
 
@@ -8,14 +7,12 @@ class WhoAreYou(commands.Cog):
 
     @commands.hybrid_command(name="whoareyou", description="Learn more about Nova!")
     async def whoareyou(self, ctx: commands.Context):
-        # Create an embed
         embed = discord.Embed(
             title="Nyaa~!",
             description="Hiya! I'm **Nova**, a bot made by the Replika Unit **FKLR-F23 \"Lila\"** (aka Lilac_Aria_Rose)!",
             color=discord.Color.pink()
         )
 
-        # Add fields for more information
         embed.add_field(
             name="About Me",
             value=(
@@ -37,10 +34,8 @@ class WhoAreYou(commands.Cog):
             inline=False
         )
 
-        # Set a footer
         embed.set_footer(text="Nyaa~! Thanks for asking about me! 🐾", icon_url=ctx.author.avatar.url)
 
-        # Send the embed
         await ctx.send(embed=embed)
 
 async def setup(bot):
