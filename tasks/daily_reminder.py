@@ -14,9 +14,6 @@ class DailyReminder:
 
     @tasks.loop(minutes=1)  # Check every minute
     async def daily_reminder(self):
-        """
-        Sends a daily reminder to girlfriend at 12 PM London Time.
-        """
         now = datetime.now(self.london_tz)
         if now.hour == 12  and now.minute == 0:
             try:
@@ -30,7 +27,4 @@ class DailyReminder:
 
     @daily_reminder.before_loop
     async def before_daily_reminder(self):
-        """
-        Ensure the bot is ready before starting the task.
-        """
         await self.bot.wait_until_ready()
