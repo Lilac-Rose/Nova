@@ -21,29 +21,16 @@ def save_sparkles(sparkles):
         json.dump(sparkles, f, indent=4)
 
 async def on_message(message: discord.Message):
-    """
-    Handles the on_message event for sparkle reactions and :boom: reactions
-    """
-    # Ignore messages from the bot itself and other bots
     if message.author.bot:
         return
 
-    # Load sparkles data from the JSON file
     sparkles = load_sparkles()
 
-    # Initialize server data if it doesn't exist
     server_id = str(message.guild.id)
     if server_id not in sparkles:
         sparkles[server_id] = {}
     if str(message.author.id) not in sparkles[server_id]:
         sparkles[server_id][str(message.author.id)] = {"epic": 0, "rare": 0, "regular": 0}
-
-    if re.search("Nova", message.content, re.IGNORECASE):
-        await message.reply(f"You called?") #Don't bother her fuckface
-
-    # Check for "b" + 2 or more "o"s + "m" (case-insensitive)
-    if re.search(r"\bb[o]{2,}m\b", message.content, re.IGNORECASE):
-        await message.add_reaction("💥")
 
     chance = random.randint(1, 100000)
 
@@ -69,7 +56,4 @@ async def on_message(message: discord.Message):
         save_sparkles(sparkles)  # Save the updated data
 
 async def setup(bot):
-    """
-    Registers the on_message event with the bot.
-    """
     bot.add_listener(on_message, "on_message")
