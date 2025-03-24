@@ -1,0 +1,345 @@
+2025-03-24 23:02:29,580 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:02:29,582 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:02:29,583 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:02:29,583 [INFO] logging in using static token
+2025-03-24 23:02:30,225 [INFO] Database initialization complete
+2025-03-24 23:02:30,227 [INFO] Shutting down database connections
+2025-03-24 23:02:31,066 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:02:31,068 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:02:31,069 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:02:31,070 [INFO] logging in using static token
+2025-03-24 23:02:31,734 [INFO] Database initialization complete
+2025-03-24 23:02:31,735 [INFO] Shutting down database connections
+2025-03-24 23:02:33,440 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:02:33,442 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:02:33,442 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:02:33,443 [INFO] logging in using static token
+2025-03-24 23:02:34,187 [INFO] Database initialization complete
+2025-03-24 23:02:34,191 [INFO] Shutting down database connections
+2025-03-24 23:02:35,100 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:02:35,102 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:02:35,102 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:02:35,103 [INFO] logging in using static token
+2025-03-24 23:02:35,757 [INFO] Database initialization complete
+2025-03-24 23:02:35,758 [INFO] Shutting down database connections
+2025-03-24 23:02:36,597 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:02:36,599 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:02:36,600 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:02:36,600 [INFO] logging in using static token
+2025-03-24 23:02:37,292 [INFO] Database initialization complete
+2025-03-24 23:02:37,293 [INFO] Shutting down database connections
+2025-03-24 23:02:38,073 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:02:38,074 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:02:38,075 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:02:38,076 [INFO] logging in using static token
+2025-03-24 23:02:38,816 [INFO] Database initialization complete
+2025-03-24 23:02:38,818 [INFO] Shutting down database connections
+2025-03-24 23:02:39,669 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:02:39,671 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:02:39,672 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:02:39,673 [INFO] logging in using static token
+2025-03-24 23:02:40,254 [INFO] Database initialization complete
+2025-03-24 23:02:40,255 [INFO] Shutting down database connections
+2025-03-24 23:02:41,225 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:02:41,227 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:02:41,228 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:02:41,229 [INFO] logging in using static token
+2025-03-24 23:02:42,002 [INFO] Database initialization complete
+2025-03-24 23:02:42,003 [INFO] Shutting down database connections
+2025-03-24 23:02:42,791 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:02:42,792 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:02:42,792 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:02:42,793 [INFO] logging in using static token
+2025-03-24 23:02:43,336 [INFO] Database initialization complete
+2025-03-24 23:02:43,338 [INFO] Shutting down database connections
+2025-03-24 23:02:44,196 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:02:44,198 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:02:44,199 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:02:44,201 [INFO] logging in using static token
+2025-03-24 23:02:45,029 [INFO] Database initialization complete
+2025-03-24 23:02:45,030 [INFO] Shutting down database connections
+2025-03-24 23:02:45,823 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:02:45,824 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:02:45,825 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:02:45,826 [INFO] logging in using static token
+2025-03-24 23:02:46,317 [INFO] Database initialization complete
+2025-03-24 23:02:46,318 [INFO] Shutting down database connections
+2025-03-24 23:02:47,120 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:02:47,122 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:02:47,123 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:02:47,124 [INFO] logging in using static token
+2025-03-24 23:02:47,942 [INFO] Database initialization complete
+2025-03-24 23:02:47,944 [INFO] Shutting down database connections
+2025-03-24 23:02:48,711 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:02:48,713 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:02:48,714 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:02:48,715 [INFO] logging in using static token
+2025-03-24 23:02:49,239 [INFO] Database initialization complete
+2025-03-24 23:02:49,241 [INFO] Shutting down database connections
+2025-03-24 23:02:50,054 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:02:50,055 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:02:50,056 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:02:50,057 [INFO] logging in using static token
+2025-03-24 23:02:50,585 [INFO] Database initialization complete
+2025-03-24 23:02:50,586 [INFO] Shutting down database connections
+2025-03-24 23:02:51,453 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:02:51,455 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:02:51,456 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:02:51,457 [INFO] logging in using static token
+2025-03-24 23:02:52,040 [INFO] Database initialization complete
+2025-03-24 23:02:52,041 [INFO] Shutting down database connections
+2025-03-24 23:02:52,781 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:02:52,782 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:02:52,783 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:02:52,784 [INFO] logging in using static token
+2025-03-24 23:02:53,341 [INFO] Database initialization complete
+2025-03-24 23:02:53,343 [INFO] Shutting down database connections
+2025-03-24 23:02:54,138 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:02:54,140 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:02:54,141 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:02:54,142 [INFO] logging in using static token
+2025-03-24 23:02:54,772 [INFO] Database initialization complete
+2025-03-24 23:02:54,773 [INFO] Shutting down database connections
+2025-03-24 23:02:55,577 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:02:55,579 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:02:55,579 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:02:55,580 [INFO] logging in using static token
+2025-03-24 23:02:56,166 [INFO] Database initialization complete
+2025-03-24 23:02:56,168 [INFO] Shutting down database connections
+2025-03-24 23:02:56,928 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:02:56,930 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:02:56,930 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:02:56,931 [INFO] logging in using static token
+2025-03-24 23:02:57,482 [INFO] Database initialization complete
+2025-03-24 23:02:57,484 [INFO] Shutting down database connections
+2025-03-24 23:02:58,340 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:02:58,342 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:02:58,343 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:02:58,344 [INFO] logging in using static token
+2025-03-24 23:02:58,871 [INFO] Database initialization complete
+2025-03-24 23:02:58,873 [INFO] Shutting down database connections
+2025-03-24 23:02:59,750 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:02:59,752 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:02:59,752 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:02:59,753 [INFO] logging in using static token
+2025-03-24 23:03:00,361 [INFO] Database initialization complete
+2025-03-24 23:03:00,363 [INFO] Shutting down database connections
+2025-03-24 23:03:01,208 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:03:01,210 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:03:01,211 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:03:01,213 [INFO] logging in using static token
+2025-03-24 23:03:01,767 [INFO] Database initialization complete
+2025-03-24 23:03:01,769 [INFO] Shutting down database connections
+2025-03-24 23:03:02,820 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:03:02,822 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:03:02,823 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:03:02,824 [INFO] logging in using static token
+2025-03-24 23:03:03,531 [INFO] Database initialization complete
+2025-03-24 23:03:03,533 [INFO] Shutting down database connections
+2025-03-24 23:03:04,366 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:03:04,368 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:03:04,369 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:03:04,370 [INFO] logging in using static token
+2025-03-24 23:03:05,270 [INFO] Database initialization complete
+2025-03-24 23:03:05,271 [INFO] Shutting down database connections
+2025-03-24 23:03:06,055 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:03:06,056 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:03:06,057 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:03:06,058 [INFO] logging in using static token
+2025-03-24 23:03:06,668 [INFO] Database initialization complete
+2025-03-24 23:03:06,670 [INFO] Shutting down database connections
+2025-03-24 23:03:07,464 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:03:07,466 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:03:07,467 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:03:07,468 [INFO] logging in using static token
+2025-03-24 23:03:08,224 [INFO] Database initialization complete
+2025-03-24 23:03:08,225 [INFO] Shutting down database connections
+2025-03-24 23:03:09,001 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:03:09,003 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:03:09,004 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:03:09,004 [INFO] logging in using static token
+2025-03-24 23:03:09,580 [INFO] Database initialization complete
+2025-03-24 23:03:09,582 [INFO] Shutting down database connections
+2025-03-24 23:03:10,427 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:03:10,429 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:03:10,429 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:03:10,430 [INFO] logging in using static token
+2025-03-24 23:03:11,009 [INFO] Database initialization complete
+2025-03-24 23:03:11,010 [INFO] Shutting down database connections
+2025-03-24 23:03:11,914 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:03:11,916 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:03:11,917 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:03:11,918 [INFO] logging in using static token
+2025-03-24 23:03:12,459 [INFO] Database initialization complete
+2025-03-24 23:03:12,461 [INFO] Shutting down database connections
+2025-03-24 23:03:13,271 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:03:13,273 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:03:13,273 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:03:13,274 [INFO] logging in using static token
+2025-03-24 23:03:13,988 [INFO] Database initialization complete
+2025-03-24 23:03:13,990 [INFO] Shutting down database connections
+2025-03-24 23:03:14,833 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:03:14,834 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:03:14,835 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:03:14,836 [INFO] logging in using static token
+2025-03-24 23:03:15,445 [INFO] Database initialization complete
+2025-03-24 23:03:15,447 [INFO] Shutting down database connections
+2025-03-24 23:03:16,248 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:03:16,250 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:03:16,251 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:03:16,252 [INFO] logging in using static token
+2025-03-24 23:03:17,298 [INFO] Database initialization complete
+2025-03-24 23:03:17,299 [INFO] Shutting down database connections
+2025-03-24 23:03:18,114 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:03:18,117 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:03:18,119 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:03:18,119 [INFO] logging in using static token
+2025-03-24 23:03:18,616 [INFO] Database initialization complete
+2025-03-24 23:03:18,618 [INFO] Shutting down database connections
+2025-03-24 23:03:19,495 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:03:19,496 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:03:19,498 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:03:19,499 [INFO] logging in using static token
+2025-03-24 23:03:20,183 [INFO] Database initialization complete
+2025-03-24 23:03:20,185 [INFO] Shutting down database connections
+2025-03-24 23:03:21,050 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:03:21,052 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:03:21,053 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:03:21,054 [INFO] logging in using static token
+2025-03-24 23:03:21,544 [INFO] Database initialization complete
+2025-03-24 23:03:21,545 [INFO] Shutting down database connections
+2025-03-24 23:03:22,342 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:03:22,344 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:03:22,344 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:03:22,345 [INFO] logging in using static token
+2025-03-24 23:03:22,907 [INFO] Database initialization complete
+2025-03-24 23:03:22,909 [INFO] Shutting down database connections
+2025-03-24 23:03:23,663 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:03:23,665 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:03:23,666 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:03:23,667 [INFO] logging in using static token
+2025-03-24 23:03:24,205 [INFO] Database initialization complete
+2025-03-24 23:03:24,207 [INFO] Shutting down database connections
+2025-03-24 23:03:25,086 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:03:25,087 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:03:25,088 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:03:25,089 [INFO] logging in using static token
+2025-03-24 23:03:25,666 [INFO] Database initialization complete
+2025-03-24 23:03:25,668 [INFO] Shutting down database connections
+2025-03-24 23:03:26,488 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:03:26,490 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:03:26,491 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:03:26,492 [INFO] logging in using static token
+2025-03-24 23:03:27,045 [INFO] Database initialization complete
+2025-03-24 23:03:27,047 [INFO] Shutting down database connections
+2025-03-24 23:03:27,832 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:03:27,833 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:03:27,834 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:03:27,835 [INFO] logging in using static token
+2025-03-24 23:03:28,382 [INFO] Database initialization complete
+2025-03-24 23:03:28,383 [INFO] Shutting down database connections
+2025-03-24 23:03:29,123 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:03:29,127 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:03:29,128 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:03:29,129 [INFO] logging in using static token
+2025-03-24 23:03:29,739 [INFO] Database initialization complete
+2025-03-24 23:03:29,741 [INFO] Shutting down database connections
+2025-03-24 23:03:30,676 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:03:30,677 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:03:30,678 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:03:30,679 [INFO] logging in using static token
+2025-03-24 23:03:31,376 [INFO] Database initialization complete
+2025-03-24 23:03:31,379 [INFO] Shutting down database connections
+2025-03-24 23:03:32,329 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:03:32,331 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:03:32,332 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:03:32,333 [INFO] logging in using static token
+2025-03-24 23:03:32,983 [INFO] Database initialization complete
+2025-03-24 23:03:32,984 [INFO] Shutting down database connections
+2025-03-24 23:03:33,742 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:03:33,744 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:03:33,745 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:03:33,746 [INFO] logging in using static token
+2025-03-24 23:03:34,338 [INFO] Database initialization complete
+2025-03-24 23:03:34,339 [INFO] Shutting down database connections
+2025-03-24 23:03:35,136 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:03:35,137 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:03:35,138 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:03:35,139 [INFO] logging in using static token
+2025-03-24 23:03:35,801 [INFO] Database initialization complete
+2025-03-24 23:03:35,803 [INFO] Shutting down database connections
+2025-03-24 23:03:36,634 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:03:36,635 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:03:36,636 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:03:36,637 [INFO] logging in using static token
+2025-03-24 23:03:37,270 [INFO] Database initialization complete
+2025-03-24 23:03:37,274 [INFO] Loading extensions...
+2025-03-24 23:03:37,276 [ERROR] ✗ Failed to load commands.xp: ExtensionFailed: Extension 'commands.xp' raised an error: ImportError: cannot import name 'xp_needed_for_level' from 'utils.xp_utils' (/home/lilac/nova/utils/xp_utils.py)
+2025-03-24 23:03:37,279 [INFO] ✓ Loaded commands.xp_lb
+2025-03-24 23:03:37,281 [INFO] ✓ Loaded commands.sparkle_leaderboard
+2025-03-24 23:03:37,284 [INFO] ✓ Loaded commands.ping
+2025-03-24 23:03:37,288 [INFO] ✓ Loaded commands.forcesparkle
+2025-03-24 23:03:37,290 [INFO] ✓ Loaded commands.pronouns
+2025-03-24 23:03:37,293 [INFO] ✓ Loaded commands.system
+2025-03-24 23:03:37,295 [INFO] ✓ Loaded commands.send_message
+2025-03-24 23:03:37,298 [INFO] ✓ Loaded commands.coins_lb
+2025-03-24 23:03:37,300 [INFO] ✓ Loaded commands.whoareyou
+2025-03-24 23:03:37,301 [INFO] ✓ Loaded events.boom
+2025-03-24 23:03:37,305 [ERROR] ✗ Failed to load events.xp_tracker: ExtensionFailed: Extension 'events.xp_tracker' raised an error: ImportError: cannot import name 'LEVEL_UP_BONUS' from 'utils.xp_utils' (/home/lilac/nova/utils/xp_utils.py)
+2025-03-24 23:03:37,305 [INFO] ✓ Loaded events.name
+2025-03-24 23:03:37,307 [INFO] ✓ Loaded events.sparkle
+2025-03-24 23:03:37,661 [INFO] Shard ID None has connected to Gateway (Session ID: 96fccefe99a242261edc9d394c41d892).
+2025-03-24 23:03:39,801 [INFO] Logged in as Nova#1119 (ID: 1346531772841590794)
+2025-03-24 23:03:39,801 [INFO] Connected to 5 guilds
+2025-03-24 23:03:40,318 [INFO] Synced 9 commands
+2025-03-24 23:04:31,984 [INFO] Shutting down database connections
+2025-03-24 23:04:32,838 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:04:32,839 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:04:32,840 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:04:32,841 [INFO] logging in using static token
+2025-03-24 23:04:33,454 [INFO] Database initialization complete
+2025-03-24 23:04:33,456 [INFO] Loading extensions...
+2025-03-24 23:04:33,457 [ERROR] ✗ Failed to load commands.xp: ExtensionFailed: Extension 'commands.xp' raised an error: ImportError: cannot import name 'xp_needed_for_level' from 'utils.xp_utils' (/home/lilac/nova/utils/xp_utils.py)
+2025-03-24 23:04:33,460 [INFO] ✓ Loaded commands.xp_lb
+2025-03-24 23:04:33,461 [INFO] ✓ Loaded commands.sparkle_leaderboard
+2025-03-24 23:04:33,463 [INFO] ✓ Loaded commands.ping
+2025-03-24 23:04:33,465 [INFO] ✓ Loaded commands.forcesparkle
+2025-03-24 23:04:33,466 [INFO] ✓ Loaded commands.pronouns
+2025-03-24 23:04:33,469 [INFO] ✓ Loaded commands.system
+2025-03-24 23:04:33,470 [INFO] ✓ Loaded commands.send_message
+2025-03-24 23:04:33,476 [INFO] ✓ Loaded commands.coins_lb
+2025-03-24 23:04:33,477 [INFO] ✓ Loaded commands.whoareyou
+2025-03-24 23:04:33,478 [INFO] ✓ Loaded events.boom
+2025-03-24 23:04:33,479 [ERROR] ✗ Failed to load events.xp_tracker: ExtensionFailed: Extension 'events.xp_tracker' raised an error: ImportError: cannot import name 'LEVEL_UP_BONUS' from 'utils.xp_utils' (/home/lilac/nova/utils/xp_utils.py)
+2025-03-24 23:04:33,480 [INFO] ✓ Loaded events.name
+2025-03-24 23:04:33,481 [INFO] ✓ Loaded events.sparkle
+2025-03-24 23:04:33,823 [INFO] Shard ID None has connected to Gateway (Session ID: 1ec5e328cb09081d5786a709481cdd36).
+2025-03-24 23:04:35,971 [INFO] Logged in as Nova#1119 (ID: 1346531772841590794)
+2025-03-24 23:04:35,972 [INFO] Connected to 5 guilds
+2025-03-24 23:04:36,448 [INFO] Synced 9 commands
+2025-03-24 23:05:48,503 [INFO] Shutting down database connections
+2025-03-24 23:05:49,536 [WARNING] PyNaCl is not installed, voice will NOT be supported
+2025-03-24 23:05:49,538 [DEBUG] on_ready has successfully been registered as an event
+2025-03-24 23:05:49,539 [DEBUG] Using selector: EpollSelector
+2025-03-24 23:05:49,539 [INFO] logging in using static token
+2025-03-24 23:05:50,176 [INFO] Database initialization complete
+2025-03-24 23:05:50,179 [INFO] Loading extensions...
+2025-03-24 23:05:50,181 [ERROR] ✗ Failed to load commands.xp: ExtensionFailed: Extension 'commands.xp' raised an error: ImportError: cannot import name 'xp_needed_for_level' from 'utils.xp_utils' (/home/lilac/nova/utils/xp_utils.py)
+2025-03-24 23:05:50,185 [INFO] ✓ Loaded commands.xp_lb
+2025-03-24 23:05:50,187 [INFO] ✓ Loaded commands.sparkle_leaderboard
+2025-03-24 23:05:50,189 [INFO] ✓ Loaded commands.ping
+2025-03-24 23:05:50,191 [INFO] ✓ Loaded commands.forcesparkle
+2025-03-24 23:05:50,193 [INFO] ✓ Loaded commands.pronouns
+2025-03-24 23:05:50,196 [INFO] ✓ Loaded commands.system
+2025-03-24 23:05:50,198 [INFO] ✓ Loaded commands.send_message
+2025-03-24 23:05:50,200 [INFO] ✓ Loaded commands.coins_lb
+2025-03-24 23:05:50,201 [INFO] ✓ Loaded commands.whoareyou
+2025-03-24 23:05:50,202 [INFO] ✓ Loaded events.boom
+2025-03-24 23:05:50,207 [ERROR] ✗ Failed to load events.xp_tracker: ExtensionFailed: Extension 'events.xp_tracker' raised an error: ImportError: cannot import name 'LEVEL_UP_BONUS' from 'utils.xp_utils' (/home/lilac/nova/utils/xp_utils.py)
+2025-03-24 23:05:50,207 [INFO] ✓ Loaded events.name
+2025-03-24 23:05:50,210 [INFO] ✓ Loaded events.sparkle
+2025-03-24 23:05:50,554 [INFO] Shard ID None has connected to Gateway (Session ID: 879b73225450bf3697bba59c5f57e6ac).
+2025-03-24 23:05:52,701 [INFO] Logged in as Nova#1119 (ID: 1346531772841590794)
+2025-03-24 23:05:52,702 [INFO] Connected to 5 guilds
+2025-03-24 23:05:53,230 [INFO] Synced 9 commands
+2025-03-24 23:11:57,510 [INFO] Shutting down database connections

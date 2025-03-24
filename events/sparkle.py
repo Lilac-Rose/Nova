@@ -1,55 +1,41 @@
 import random
 import discord
-import json
-from pathlib import Path
+from discord.ext import commands
+from utils.database import get_connection
 
-SPARKLES_FILE = Path("json/sparkles.json")
+class Sparkle(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
 
-def load_sparkles():
-    if SPARKLES_FILE.exists():
-        with open(SPARKLES_FILE, "r") as f:
-            return json.load(f)
-    return {}
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author.bot:
+            return
 
-def save_sparkles(sparkles):
-    SPARKLES_FILE.parent.mkdir(exist_ok=True)
-    with open(SPARKLES_FILE, "w") as f:
-        json.dump(sparkles, f, indent=4)
+        chance = random.randint(1, 100000)
+        reaction_type = None
 
-async def on_message(message: discord.Message):
-    if message.author.bot:
-        return
+        if chance == 1:
+            reaction_type = ("✨", "epic", "an **epic sparkle**")
+        elif chance <= 10:
+            reaction_type = ("🌟", "rare", "a **rare sparkle**")
+        elif chance <= 100:
+            reaction_type = ("⭐", "regular", "a **sparkle**")
 
-    sparkles = load_sparkles()
+        if reaction_type:
+            emoji, type_key, description = reaction_type
+            await message.add_reaction(emoji)
+            await message.reply(f"**{message.author.name}** got {description}! {emoji}", mention_author=False)
 
-    server_id = str(message.guild.id)
-    if server_id not in sparkles:
-        sparkles[server_id] = {}
-    if str(message.author.id) not in sparkles[server_id]:
-        sparkles[server_id][str(message.author.id)] = {"epic": 0, "rare": 0, "regular": 0}
-
-    chance = random.randint(1, 100000)
-
-    # Check for epic sparkle reaction (1/100,000 chance)
-    if chance == 1:
-        await message.add_reaction("✨")
-        await message.reply(f"**{message.author.name}** got an **epic sparkle**! ✨", mention_author=False)
-        sparkles[server_id][str(message.author.id)]["epic"] += 1
-        save_sparkles(sparkles)  # Save the updated data
-
-    # Check for rare sparkle reaction (1/10,000 chance)
-    elif chance <= 10:
-        await message.add_reaction("🌟")
-        await message.reply(f"**{message.author.name}** got a **rare sparkle**! 🌟", mention_author=False)
-        sparkles[server_id][str(message.author.id)]["rare"] += 1
-        save_sparkles(sparkles)  # Save the updated data
-
-    # Check for regular sparkle reaction (1/1,000 chance)
-    elif chance <= 100:
-        await message.add_reaction("⭐")
-        await message.reply(f"**{message.author.name}** got a **sparkle**! ⭐", mention_author=False)
-        sparkles[server_id][str(message.author.id)]["regular"] += 1
-        save_sparkles(sparkles)  # Save the updated data
+            async with await get_connection() as conn:
+                async with conn.cursor() as cur:
+                    await cur.execute(
+                        f"""INSERT INTO sparkles (server_id, user_id, {type_key})
+                        VALUES (?, ?, 1)
+                        ON CONFLICT(server_id, user_id) DO UPDATE SET
+                        {type_key} = {type_key} + 1""",
+                        (str(message.guild.id), str(message.author.id)))
+                    await conn.commit()
 
 async def setup(bot):
-    bot.add_listener(on_message, "on_message")
+    await bot.add_cog(Sparkle(bot))
