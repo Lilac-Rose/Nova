@@ -69,6 +69,6 @@ async def on_ready():
 token = os.getenv('TOKEN')
 if not token:
     print("Error: The 'TOKEN' environment variable is not set.")
-    sys.exit(1)  # Exit with a non-zero status code to indicate an error
+    sys.exit(1)
 
 bot.run(token)
