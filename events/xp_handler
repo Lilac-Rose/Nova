@@ -1,0 +1,53 @@
+import discord
+import random
+from utils.xp_utils import calculate_level, LEVEL_UP_BONUS
+from utils.xp_utils import XP_PER_MESSAGE_MIN, XP_PER_MESSAGE_MAX
+
+async def on_message(message: discord.Message):
+    if message.author.bot:
+        print("Message from bot - ignoring")
+        return
+
+    bot = message._state._get_client()
+    server_id = str(message.guild.id)
+    user_id = str(message.author.id)
+
+    print(f"\n--- New Message ---")
+    print(f"User: {message.author} (ID: {user_id})")
+    print(f"Server: {message.guild} (ID: {server_id})")
+    
+    if server_id not in bot.xp_data:
+        print(f"Creating new server entry for {server_id}")
+        bot.xp_data[server_id] = {}
+    if user_id not in bot.xp_data[server_id]:
+        print(f"Creating new user entry for {user_id}")
+        bot.xp_data[server_id][user_id] = 0
+    if user_id not in bot.coins_data:
+        print(f"Creating new coins entry for {user_id}")
+        bot.coins_data[user_id] = 0
+
+    current_level, _ = calculate_level(bot.xp_data[server_id][user_id])
+    xp_gained = random.randint(XP_PER_MESSAGE_MIN, XP_PER_MESSAGE_MAX)
+    
+    print(f"Current XP: {bot.xp_data[server_id][user_id]}")
+    print(f"Gaining {xp_gained} XP")
+    
+    bot.xp_data[server_id][user_id] += xp_gained
+    bot.coins_data[user_id] += xp_gained
+    
+    print(f"New XP total: {bot.xp_data[server_id][user_id]}")
+    print(f"New coins total: {bot.coins_data[user_id]}")
+
+    new_level, _ = calculate_level(bot.xp_data[server_id][user_id])
+    if new_level > current_level:
+        coins_gained = LEVEL_UP_BONUS * (new_level - current_level)
+        bot.coins_data[user_id] += coins_gained
+        await message.channel.send(
+            f"🎉 {message.author.mention} leveled up to level {new_level}! "
+            f"+{coins_gained} Nova Coins!",
+            delete_after=10
+        )
+
+async def setup(bot):
+    print("XP handler registered!")
+    bot.add_listener(on_message, "on_message")

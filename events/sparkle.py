@@ -1,5 +1,4 @@
 import random
-import re
 import discord
 import json
 from pathlib import Path
@@ -7,15 +6,12 @@ from pathlib import Path
 SPARKLES_FILE = Path("json/sparkles.json")
 
 def load_sparkles():
-    """Load the sparkles data from the JSON file."""
     if SPARKLES_FILE.exists():
         with open(SPARKLES_FILE, "r") as f:
             return json.load(f)
     return {}
 
 def save_sparkles(sparkles):
-    """Save the sparkles data to the JSON file."""
-    # Ensure the "json" directory exists
     SPARKLES_FILE.parent.mkdir(exist_ok=True)
     with open(SPARKLES_FILE, "w") as f:
         json.dump(sparkles, f, indent=4)

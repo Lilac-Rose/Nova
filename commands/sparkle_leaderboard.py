@@ -1,10 +1,9 @@
 import discord
-from discord.ext import commands
-from discord import app_commands
 import json
 from pathlib import Path
+from discord.ext import commands
+from discord import app_commands
 
-# Path to the JSON file
 SPARKLES_FILE = Path("json/sparkles.json")
 
 def load_sparkles():
@@ -67,7 +66,7 @@ class Leaderboard(commands.Cog):
 
         await interaction.response.send_message(
             f"**{sparkle_type.capitalize()} Sparkle Leaderboard:**\n" + "\n".join(leaderboard_text),
-            ephemeral=False  # Make the response visible to everyone
+            ephemeral=False
         )
 
     @leaderboard.autocomplete("sparkle_type")
