@@ -198,50 +198,78 @@ class RankSystem(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="buyrank", description="Purchase a special rank")
-    @app_commands.describe(rank_name="Name of the rank to purchase")
+    @app_commands.describe(rank_name="Name of the rank to purchase (see /shop for exact names)")
     async def buy_rank(self, ctx: commands.Context, rank_name: str):
         """Purchase a rank from the shop"""
         rank_name = rank_name.lower()
+        
         if rank_name not in self.shop_ranks:
-            return await ctx.send("That rank doesn't exist in the shop!", ephemeral=True)
+            available = ", ".join(f"`{r}`" for r in self.shop_ranks.keys())
+            return await ctx.send(
+                f"That rank doesn't exist! Available ranks: {available}",
+                ephemeral=True
+            )
         
         price = self.shop_ranks[rank_name]
         
         async with await get_connection() as conn:
             async with conn.cursor() as cur:
-                # Check user's coins
+                # Check if user already owns the rank
+                await cur.execute(
+                    "SELECT 1 FROM user_ranks WHERE user_id = ? AND rank_name = ?",
+                    (str(ctx.author.id), rank_name)
+                )
+                if await cur.fetchone():
+                    return await ctx.send(
+                        f"You already own the `{rank_name}` rank!",
+                        ephemeral=True
+                    )
+                
+                # Verify and deduct coins
                 await cur.execute(
                     "SELECT coins FROM user_coins WHERE user_id = ?",
                     (str(ctx.author.id),)
                 )
                 result = await cur.fetchone()
-                if not result:
-                    return await ctx.send("You don't have a coin balance yet!", ephemeral=True)
                 
-                coins = result[0]
-                if coins < price:
+                if not result:
                     return await ctx.send(
-                        f"You don't have enough coins! You need {price:,} but only have {coins:,}.",
+                        "You don't have a coin balance yet!",
                         ephemeral=True
                     )
                 
-                # Deduct coins
-                await cur.execute(
-                    "UPDATE user_coins SET coins = coins - ? WHERE user_id = ?",
-                    (price, str(ctx.author.id))
-                )
+                if result[0] < price:
+                    return await ctx.send(
+                        f"Not enough coins! You need {price:,} but have {result[0]:,}.",
+                        ephemeral=True
+                    )
                 
-                # Add rank
-                await cur.execute(
-                    """INSERT INTO user_ranks (user_id, rank_name, rank_type, is_equipped)
-                    VALUES (?, ?, 'purchased', 0)
-                    ON CONFLICT(user_id, rank_name) DO NOTHING""",
-                    (str(ctx.author.id), rank_name)
-                )
-                
-                await conn.commit()
+                # Perform the transaction
+                try:
+                    await cur.execute(
+                        "UPDATE user_coins SET coins = coins - ? WHERE user_id = ?",
+                        (price, str(ctx.author.id))
+                    )
+                    
+                    await cur.execute(
+                        """INSERT INTO user_ranks (user_id, rank_name, rank_type, is_equipped)
+                        VALUES (?, ?, 'purchased', 0)""",
+                        (str(ctx.author.id), rank_name)
+                    )
+                    
+                    await conn.commit()
+                except Exception as e:
+                    await conn.rollback()
+                    await ctx.send(
+                        "❌ Transaction failed! Your coins were not deducted.",
+                        ephemeral=True
+                    )
+                    raise e
         
-        await ctx.send(f"🎉 Successfully purchased the {rank_name.title()} rank for {price:,} coins!")
+        await ctx.send(
+            f"🎉 Successfully purchased `{rank_name}` rank for {price:,} coins!",
+            ephemeral=True
+        )
 
 async def setup(bot):
     await bot.add_cog(RankSystem(bot))
