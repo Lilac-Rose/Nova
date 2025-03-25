@@ -1,99 +1,104 @@
-import logging
+import time
+import discord
+from discord import Embed
 from discord.ext import commands
-from typing import Optional
-from pathlib import Path
 
 class BotLogger:
-    def __init__(self, bot):
+    def __init__(self, bot=None, log_channel_id=None):
         self.bot = bot
-        self.log_channel_id = 1353840766694457454  # Your log channel ID
-        self.file_logger = logging.getLogger('nova')
-        
-        # Configure file logging
-        self._setup_file_logging()
-    
-    def _setup_file_logging(self):
-        """Configure file-based logging"""
-        LOG_DIR = Path("logs")
-        LOG_DIR.mkdir(exist_ok=True)
-        
-        file_handler = logging.FileHandler(LOG_DIR/'bot.log')
-        file_handler.setFormatter(logging.Formatter(
-            '%(asctime)s [%(levelname)s] %(message)s'
-        ))
-        self.file_logger.addHandler(file_handler)
+        self.log_channel_id = log_channel_id
+        self.start_time = time.time()
+        self._is_restart = False
 
-    async def log(self, message: str, level: str = "info", alert: bool = False):
-        """
-        Log messages to both file and Discord channel
-        :param message: The message to log
-        :param level: Log level (info, warning, error, debug)
-        :param alert: Whether to @here in Discord for important messages
-        """
-        # Log to file
-        getattr(self.file_logger, level.lower())(message)
-        
-        # Log to Discord channel
+    def set_restart(self, restarting: bool):
+        self._is_restart = restarting
+
+    async def log(self, message: str, level: str = "info", alert: bool = False, embed: Embed = None):
+        if not self.bot or not self.log_channel_id:
+            print(f"Would log: {message}")  # Fallback print
+            return
+            
         try:
-            channel = self.bot.get_channel(self.log_channel_id)
-            if channel:
-                prefix = {
-                    'info': 'ℹ️',
-                    'warning': '⚠️',
-                    'error': '❌',
-                    'debug': '🐛'
-                }.get(level.lower(), '📝')
-                
-                discord_msg = f"{prefix} {message[:1900]}"  # Truncate to avoid overflow
+            # Fetch the channel fresh each time to ensure we have permissions
+            channel = await self.bot.fetch_channel(self.log_channel_id)
+            if not channel:
+                print(f"Channel {self.log_channel_id} not found")
+                return
+
+            formats = {
+                'info': ("📝 Info", 0x3498db),
+                'warning': ("⚠️ Warning", 0xf39c12),
+                'error': ("❌ Error", 0xe74c3c),
+                'debug': ("🐛 Debug", 0x9b59b6),
+                'critical': ("🚨 Critical", 0xe74c3c),
+                'startup': ("🟢 Online", 0x2ecc71),
+                'shutdown': ("🔴 Offline", 0xe74c3c),
+                'restart': ("🟡 Restarting", 0xf1c40f)
+            }
+            
+            header, color = formats.get(level.lower(), ("📌 Log", 0x7289da))
+            
+            if embed is None:
+                embed = Embed(
+                    title=header,
+                    description=f"```{message[:2000]}```",
+                    color=color
+                )
+            else:
+                embed.color = color
+                embed.title = f"{header} | {embed.title}" if embed.title else header
+            
+            embed.timestamp = discord.utils.utcnow()
+            
+            try:
                 if alert:
-                    discord_msg = f"@here {discord_msg}"
+                    await channel.send("@here", embed=embed)
+                else:
+                    await channel.send(embed=embed)
+            except discord.Forbidden:
+                print(f"Missing permissions to send messages in logging channel {self.log_channel_id}")
+            except discord.HTTPException as e:
+                print(f"Failed to send log message: {e}")
                 
-                await channel.send(discord_msg)
         except Exception as e:
-            self.file_logger.error(f"Failed to send log to Discord: {e}")
+            print(f"Logging failed completely: {e}")
 
-def setup_activity_log():
-    """Setup the activity logger"""
-    activity_log = logging.getLogger('activity')
-    activity_log.setLevel(logging.INFO)
-    activity_log.propagate = False
-    
-    LOG_DIR = Path("logs")
-    LOG_DIR.mkdir(exist_ok=True)
-    
-    handler = logging.FileHandler(LOG_DIR/'activity.log')
-    handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s'))
-    activity_log.addHandler(handler)
-    return activity_log
-
-async def log_command(ctx: commands.Context):
-    """Log command execution details"""
-    activity_log = logging.getLogger('activity')
-    guild_info = f"{ctx.guild.name} ({ctx.guild.id})" if ctx.guild else 'DM'
-    activity_log.info(
-        f"COMMAND: {ctx.command.qualified_name} | "
-        f"User: {ctx.author} ({ctx.author.id}) | "
-        f"Server: {guild_info} | "
-        f"Args: {ctx.kwargs}"
-    )
-
-def log_xp_event(user: discord.User, xp_gain: int, new_xp: int, level_up: bool = False):
-    """Log XP-related events"""
-    activity_log = logging.getLogger('activity')
-    activity_log.info(
-        f"XP: {user} ({user.id}) | "
-        f"Gained: +{xp_gain} XP | "
-        f"Total: {new_xp} XP | "
-        f"Level Up: {'Yes' if level_up else 'No'} | "
-        f"Server: {user.guild.name if hasattr(user, 'guild') and user.guild else 'DM'}"
-    )
-
-def log_coins_event(user: discord.User, coins_change: int, new_balance: int, reason: str):
-    """Log coins transactions"""
-    activity_log = logging.getLogger('activity')
-    activity_log.info(
-        f"COINS: {user} ({user.id}) | "
-        f"Change: {coins_change:+} coins | "
-        f"New Balance: {new_balance} | "
-        f"Reason: {reason}"
-    )
+    async def log_command_error(self, ctx, error):
+        embed = Embed(
+            title="Command Failed",
+            color=0xe74c3c,
+            timestamp=discord.utils.utcnow()
+        )
+        
+        embed.add_field(
+            name="Command",
+            value=f"`{ctx.command}`" if ctx.command else "Unknown",
+            inline=False
+        )
+        
+        embed.add_field(
+            name="User",
+            value=f"{ctx.author.mention} (`{ctx.author.id}`)",
+            inline=True
+        )
+        
+        embed.add_field(
+            name="Channel",
+            value=ctx.channel.mention if hasattr(ctx.channel, 'mention') else "DM",
+            inline=True
+        )
+        
+        error_msg = str(error)[:1000]
+        if isinstance(error, commands.CommandInvokeError):
+            error_msg = f"{type(error.original).__name__}: {error_msg}"
+        
+        embed.add_field(
+            name="Error",
+            value=f"```{error_msg}```",
+            inline=False
+        )
+        
+        if ctx.guild:
+            embed.set_footer(text=f"Guild: {ctx.guild.name} (ID: {ctx.guild.id})")
+        
+        await self.log("Command error occurred", level="error", embed=embed)

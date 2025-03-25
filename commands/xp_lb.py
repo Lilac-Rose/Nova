@@ -1,8 +1,7 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
-from utils.database import get_connection
-from utils.xp_utils import calculate_level
+from utils.xp import calculate_level
 
 class XpLeaderboard(commands.Cog):
     def __init__(self, bot):
@@ -12,17 +11,16 @@ class XpLeaderboard(commands.Cog):
     @app_commands.describe(limit="Number of users to show (max 20)")
     async def xp_leaderboard(self, ctx: commands.Context, limit: int = 10):
         limit = max(1, min(20, limit))
-        server_id = str(ctx.guild.id)
         
-        async with await get_connection() as conn:
-            async with conn.cursor() as cursor:
-                await cursor.execute("""
+        async with self.bot.db.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute("""
                     SELECT user_id, xp FROM user_xp 
-                    WHERE server_id = ? 
+                    WHERE server_id = ?
                     ORDER BY xp DESC 
                     LIMIT ?
-                """, (server_id, limit))
-                results = await cursor.fetchall()
+                """, (str(ctx.guild.id), limit))
+                results = await cur.fetchall()
                 
                 if not results:
                     await ctx.send("No XP data available for this server yet.", ephemeral=True)
@@ -30,18 +28,19 @@ class XpLeaderboard(commands.Cog):
                 
                 embed = discord.Embed(
                     title=f"{ctx.guild.name} XP Leaderboard",
-                    color=discord.Color.gold()
+                    color=discord.Color.gold(),
+                    description="Top members by XP"
                 )
                 
                 for rank, (user_id, xp) in enumerate(results, 1):
                     user = ctx.guild.get_member(int(user_id))
-                    if user:
-                        level, _ = calculate_level(xp)
-                        embed.add_field(
-                            name=f"{rank}. {user.display_name}",
-                            value=f"Level {level} | {xp} XP",
-                            inline=False
-                        )
+                    level, _ = calculate_level(xp)
+                    display_name = user.display_name if user else f"Unknown User ({user_id})"
+                    embed.add_field(
+                        name=f"{rank}. {display_name}",
+                        value=f"Level {level} | {xp:,} XP",
+                        inline=False
+                    )
                 
                 await ctx.send(embed=embed)
 
