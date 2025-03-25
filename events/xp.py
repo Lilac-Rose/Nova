@@ -48,12 +48,6 @@ class XPTracker(commands.Cog):
                 str(message.author.id),
                 str(message.guild.id)
             )
-            
-            if leveled_up:
-                await message.channel.send(
-                    f"🎉 {message.author.mention} reached level {new_level}!",
-                    delete_after=10
-                )
                 
         except Exception as e:
             await self.bot.logger.log(
