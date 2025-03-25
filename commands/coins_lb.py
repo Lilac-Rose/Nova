@@ -18,7 +18,7 @@ class CoinsLeaderboard(commands.Cog):
             await ctx.send("This server has no members to display.", ephemeral=True)
             return
             
-        async with self.bot.db.acquire() as conn:
+        async with self.bot.db_pool.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute(
                     f"SELECT user_id, coins FROM user_coins "
@@ -32,28 +32,21 @@ class CoinsLeaderboard(commands.Cog):
                     await ctx.send("No coins data available for members of this server.", ephemeral=True)
                     return
                 
-                safe_server_name = escape_markdown(ctx.guild.name)
                 embed = discord.Embed(
-                    title=f"💰 {safe_server_name} Nova Coins Leaderboard",
-                    color=discord.Color.green()
-                )
+                    title=f"💰 {escape_markdown(ctx.guild.name)} Nova Coins Leaderboard",
+                    color=discord.Color.green())
                 
                 for rank, (user_id, coins) in enumerate(results, 1):
                     user = ctx.guild.get_member(int(user_id))
-                    if user:
-                        safe_name = escape_markdown(user.display_name)
-                        avatar = user.display_avatar.url
-                    else:
-                        safe_name = f"Unknown User ({user_id})"
-                        avatar = None
+                    display_name = escape_markdown(user.display_name) if user else f"Unknown User ({user_id})"
                     
                     embed.add_field(
-                        name=f"{rank}. {safe_name}",
+                        name=f"{rank}. {display_name}",
                         value=f"{coins:,} Nova Coins",
-                        inline=False
-                    )
-                    if avatar and rank == 1:  # Only set thumbnail for top user
-                        embed.set_thumbnail(url=avatar)
+                        inline=False)
+                    
+                    if rank == 1 and user:
+                        embed.set_thumbnail(url=user.display_avatar.url)
                 
                 await ctx.send(embed=embed)
 
