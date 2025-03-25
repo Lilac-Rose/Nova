@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
+from discord.utils import escape_markdown
 
 class CoinsLeaderboard(commands.Cog):
     def __init__(self, bot):
@@ -11,36 +12,48 @@ class CoinsLeaderboard(commands.Cog):
     async def coins_leaderboard(self, ctx: commands.Context, limit: int = 10):
         limit = max(1, min(20, limit))
         
-        # Get all member IDs in the current guild
         guild_member_ids = {str(member.id) for member in ctx.guild.members}
         
+        if not guild_member_ids:
+            await ctx.send("This server has no members to display.", ephemeral=True)
+            return
+            
         async with self.bot.db.acquire() as conn:
             async with conn.cursor() as cur:
-                await cur.execute("""
-                    SELECT user_id, coins FROM user_coins 
-                    WHERE user_id IN ({})
-                    ORDER BY coins DESC 
-                    LIMIT ?
-                """.format(','.join(['?']*len(guild_member_ids))), (*guild_member_ids, limit))
+                await cur.execute(
+                    f"SELECT user_id, coins FROM user_coins "
+                    f"WHERE user_id IN ({','.join(['?']*len(guild_member_ids))}) "
+                    "ORDER BY coins DESC LIMIT ?",
+                    (*guild_member_ids, limit)
+                )
                 results = await cur.fetchall()
                 
                 if not results:
                     await ctx.send("No coins data available for members of this server.", ephemeral=True)
                     return
                 
+                safe_server_name = escape_markdown(ctx.guild.name)
                 embed = discord.Embed(
-                    title=f"💰 {ctx.guild.name} Nova Coins Leaderboard",
+                    title=f"💰 {safe_server_name} Nova Coins Leaderboard",
                     color=discord.Color.green()
                 )
                 
                 for rank, (user_id, coins) in enumerate(results, 1):
-                    user = self.bot.get_user(int(user_id)) or await self.bot.fetch_user(int(user_id))
-                    display_name = user.display_name if user else f"Unknown User ({user_id})"
+                    user = ctx.guild.get_member(int(user_id))
+                    if user:
+                        safe_name = escape_markdown(user.display_name)
+                        avatar = user.display_avatar.url
+                    else:
+                        safe_name = f"Unknown User ({user_id})"
+                        avatar = None
+                    
                     embed.add_field(
-                        name=f"{rank}. {display_name}",
+                        name=f"{rank}. {safe_name}",
                         value=f"{coins:,} Nova Coins",
                         inline=False
                     )
+                    if avatar and rank == 1:  # Only set thumbnail for top user
+                        embed.set_thumbnail(url=avatar)
                 
                 await ctx.send(embed=embed)
 
