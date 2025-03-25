@@ -71,15 +71,6 @@ class XPTracker(commands.Cog):
                     level = calculate_level(new_xp)[0]
                     await self._grant_level_up_rewards(conn, str(message.author.id), level)
                     
-                    # Optional level up notification
-                    channel = message.channel
-                    try:
-                        await channel.send(
-                            f"🎉 {message.author.mention} leveled up to **level {level}**!",
-                            delete_after=10)
-                    except discord.Forbidden:
-                        pass
-                    
         except Exception as e:
             await self.bot.logger.log(
                 f"XP error: {type(e).__name__}: {str(e)}",

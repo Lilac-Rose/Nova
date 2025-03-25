@@ -8,7 +8,6 @@ from utils.xp import calculate_level, xp_for_next_level
 class XP(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        # Level ranks structure with proper capitalization
         self.level_ranks = {
             0: "Nova Seed",
             5: "Blossoming Nova",
@@ -42,7 +41,7 @@ class XP(commands.Cog):
         """Format rank name with proper capitalization"""
         if not rank:
             return "None"
-        return rank.title()  # Capitalizes first letter of each word
+        return rank.title()
 
     async def get_user_stats(self, server_id: str, user_id: str):
         try:
@@ -98,7 +97,6 @@ class XP(commands.Cog):
             color=discord.Color.blue()
         )
         
-        # Add both rank fields with proper capitalization
         embed.add_field(
             name="Level Rank",
             value=self.format_rank_name(level_rank),
