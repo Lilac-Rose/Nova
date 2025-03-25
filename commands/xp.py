@@ -10,7 +10,6 @@ class XP(commands.Cog):
         self.bot = bot
 
     async def get_user_stats(self, server_id: str, user_id: str):
-        """Get both XP and coins in one query"""
         try:
             async with await get_connection() as conn:
                 async with conn.cursor() as cur:
@@ -43,8 +42,7 @@ class XP(commands.Cog):
             )
             return (0, 0)  # Fallback values
 
-    @commands.hybrid_command(name="xp", description="Check your XP and level")
-    @app_commands.describe(user="User to check (optional)")
+    @commands.hybrid_command(name="stats", description="Check your stats! (Coins, XP, and level)")
     async def xp(self, ctx: commands.Context, user: Optional[discord.User] = None):
         target = user or ctx.author
         xp, coins = await self.get_user_stats(str(ctx.guild.id), str(target.id))
