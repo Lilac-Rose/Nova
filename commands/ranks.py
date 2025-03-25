@@ -1,12 +1,14 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 from utils.database import get_connection
 
 class RankSystem(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        
+        # Level-based ranks
         self.level_ranks = {
             0: "Nova Seed",
             5: "Blossoming Nova",
@@ -31,7 +33,7 @@ class RankSystem(commands.Cog):
             100: "Ultimate Nova"
         }
         
-        # Purchasable ranks
+        # Purchasable ranks and their prices
         self.shop_ranks = {
             "cutie": 1000,
             "goddess": 10000,
@@ -47,6 +49,7 @@ class RankSystem(commands.Cog):
         }
 
     def _calculate_level_from_xp(self, xp: int) -> int:
+        """Calculate level based on XP using progressive scaling"""
         level = 0
         xp_needed = 100
         while xp >= xp_needed:
@@ -55,99 +58,190 @@ class RankSystem(commands.Cog):
             xp_needed = int(xp_needed * 1.2)
         return level
 
+    def get_all_achieved_level_ranks(self, level: int) -> List[str]:
+        """Get all level ranks achieved up to current level"""
+        return [rank for lvl, rank in sorted(self.level_ranks.items()) if lvl <= level]
+
     def get_current_level_rank(self, level: int) -> str:
-        return next((rank for lvl, rank in sorted(self.level_ranks.items(), reverse=True) if lvl <= level), "Newbie")
+        """Get the highest rank achieved for current level"""
+        achieved = self.get_all_achieved_level_ranks(level)
+        return achieved[-1] if achieved else "Nova Seed"
+
+    def get_next_level_rank(self, level: int) -> Optional[Tuple[int, str]]:
+        """Get the next rank to achieve (level threshold and name)"""
+        for lvl, rank in sorted(self.level_ranks.items()):
+            if lvl > level:
+                return (lvl, rank)
+        return None
 
     async def _ensure_level_ranks(self, user_id: str, xp: int):
-        """Ensure user has all appropriate level ranks"""
+        """Ensure user has all appropriate level ranks in database"""
         level = self._calculate_level_from_xp(xp)
-        current_rank_level = (level // 5) * 5
+        achieved_ranks = self.get_all_achieved_level_ranks(level)
         
         async with await get_connection() as conn:
             async with conn.cursor() as cur:
-                # Get all achieved level thresholds
-                achieved_thresholds = [lvl for lvl in self.level_ranks.keys() if lvl <= current_rank_level]
-                
-                # Add any missing level ranks
-                for threshold in achieved_thresholds:
-                    rank_name = self.level_ranks[threshold]
+                # Insert missing level ranks
+                for rank_name in achieved_ranks:
                     await cur.execute('''
                         INSERT OR IGNORE INTO user_ranks 
                         (user_id, rank_name, rank_type)
                         VALUES (?, ?, 'level')
                     ''', (str(user_id), rank_name))
-                
                 await conn.commit()
 
-    @commands.hybrid_command(name="myranks", description="View all your owned ranks")
+    @commands.hybrid_command(name="myranks", description="View your complete rank progression")
     async def show_my_ranks(self, ctx: commands.Context):
+        """Display all earned and purchased ranks"""
         async with await get_connection() as conn:
             async with conn.cursor() as cur:
-                # Get current level
+                # Get user's XP and level
                 await cur.execute(
                     "SELECT xp FROM user_xp WHERE server_id = ? AND user_id = ?",
-                    (str(ctx.guild.id), str(ctx.author.id)))
+                    (str(ctx.guild.id), str(ctx.author.id))
+                )
                 xp_result = await cur.fetchone()
                 xp = xp_result[0] if xp_result else 0
                 level = self._calculate_level_from_xp(xp)
-                current_rank = self.get_current_level_rank(level)
                 
                 # Get all owned ranks
-                await cur.execute(
-                    """SELECT rank_name, is_equipped, rank_type FROM user_ranks 
-                    WHERE user_id = ? ORDER BY 
-                    CASE rank_type
-                        WHEN 'level' THEN 0
-                        ELSE 1
-                    END, rank_name""",
-                    (str(ctx.author.id),))
+                await cur.execute('''
+                    SELECT rank_name, is_equipped, rank_type FROM user_ranks
+                    WHERE user_id = ?
+                    ORDER BY
+                        CASE rank_type
+                            WHEN 'level' THEN 0
+                            ELSE 1
+                        END,
+                        rank_name
+                ''', (str(ctx.author.id),))
                 all_ranks = await cur.fetchall()
                 
+        # Get rank information
+        earned_ranks = self.get_all_achieved_level_ranks(level)
+        current_rank = self.get_current_level_rank(level)
+        next_rank_info = self.get_next_level_rank(level)
+        
+        # Create embed
         embed = discord.Embed(
             title=f"{ctx.author.display_name}'s Ranks",
-            color=discord.Color.lighter_grey()
+            color=discord.Color.purple()
         )
         
-        # Current level rank (shows first)
+        # Current Rank
         embed.add_field(
-            name="Current Level Rank",
-            value=f"🌱 {current_rank} (Level {level})",
+            name="🌟 Current Rank",
+            value=f"{current_rank} (Level {level})",
             inline=False
         )
         
-        # Other level ranks
-        level_ranks = [r for r in all_ranks if r[2] == 'level' and r[0] != current_rank]
-        if level_ranks:
+        # Earned Level Ranks
+        if len(earned_ranks) > 1:
             embed.add_field(
-                name="Other Level Ranks",
-                value="\n".join(f"• {r[0]}" for r in level_ranks),
+                name="✨ Rank Journey",
+                value="\n".join(f"• {rank}" for rank in earned_ranks[:-1]),
                 inline=False
             )
         
-        # Purchased ranks
+        # Next Rank
+        if next_rank_info:
+            next_lvl, next_rank = next_rank_info
+            embed.add_field(
+                name="🔜 Next Rank",
+                value=f"{next_rank} at level {next_lvl}",
+                inline=False
+            )
+        
+        # Purchased Ranks
         purchased_ranks = [r for r in all_ranks if r[2] == 'purchased']
         if purchased_ranks:
             ranks_list = []
             for rank_name, is_equipped, _ in purchased_ranks:
-                star = "⭐ " if is_equipped else ""
-                ranks_list.append(f"{star}{rank_name.capitalize()}")
+                prefix = "⭐ " if is_equipped else ""
+                ranks_list.append(f"{prefix}{rank_name.title()}")
             
             embed.add_field(
-                name="Purchased Ranks",
+                name="🛍️ Purchased Ranks",
                 value="\n".join(ranks_list),
                 inline=False
             )
-            embed.set_footer(text="⭐ = Currently equipped")
         else:
             embed.add_field(
-                name="Purchased Ranks",
-                value="You haven't bought any ranks yet! Use !shop",
+                name="🛍️ Purchased Ranks",
+                value="Use `/shop` to buy special ranks!",
                 inline=False
             )
         
+        embed.set_thumbnail(url=ctx.author.display_avatar.url)
         await ctx.send(embed=embed)
 
-    # ... [keep all other commands unchanged] ...
+    @commands.hybrid_command(name="shop", description="View available purchasable ranks")
+    async def rank_shop(self, ctx: commands.Context):
+        """Display the rank shop"""
+        embed = discord.Embed(
+            title="🛍️ Rank Shop",
+            description="Purchase these special ranks with your coins!",
+            color=discord.Color.gold()
+        )
+        
+        shop_items = []
+        for rank, price in sorted(self.shop_ranks.items(), key=lambda x: x[1]):
+            shop_items.append(f"• {rank.title()}: {price:,} coins")
+        
+        embed.add_field(
+            name="Available Ranks",
+            value="\n".join(shop_items),
+            inline=False
+        )
+        
+        embed.set_footer(text="Use /buyrank [name] to purchase")
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name="buyrank", description="Purchase a special rank")
+    @app_commands.describe(rank_name="Name of the rank to purchase")
+    async def buy_rank(self, ctx: commands.Context, rank_name: str):
+        """Purchase a rank from the shop"""
+        rank_name = rank_name.lower()
+        if rank_name not in self.shop_ranks:
+            return await ctx.send("That rank doesn't exist in the shop!", ephemeral=True)
+        
+        price = self.shop_ranks[rank_name]
+        
+        async with await get_connection() as conn:
+            async with conn.cursor() as cur:
+                # Check user's coins
+                await cur.execute(
+                    "SELECT coins FROM user_coins WHERE user_id = ?",
+                    (str(ctx.author.id),)
+                )
+                result = await cur.fetchone()
+                if not result:
+                    return await ctx.send("You don't have a coin balance yet!", ephemeral=True)
+                
+                coins = result[0]
+                if coins < price:
+                    return await ctx.send(
+                        f"You don't have enough coins! You need {price:,} but only have {coins:,}.",
+                        ephemeral=True
+                    )
+                
+                # Deduct coins
+                await cur.execute(
+                    "UPDATE user_coins SET coins = coins - ? WHERE user_id = ?",
+                    (price, str(ctx.author.id))
+                )
+                
+                # Add rank
+                await cur.execute(
+                    """INSERT INTO user_ranks (user_id, rank_name, rank_type, is_equipped)
+                    VALUES (?, ?, 'purchased', 0)
+                    ON CONFLICT(user_id, rank_name) DO NOTHING""",
+                    (str(ctx.author.id), rank_name)
+                )
+                
+                await conn.commit()
+        
+        await ctx.send(f"🎉 Successfully purchased the {rank_name.title()} rank for {price:,} coins!")
 
 async def setup(bot):
     await bot.add_cog(RankSystem(bot))
