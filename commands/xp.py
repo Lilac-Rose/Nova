@@ -128,7 +128,6 @@ class XP(commands.Cog):
             inline=True
         )
         
-        # Show next level rank if available
         next_rank = next(
             (lvl, rank) for lvl, rank in sorted(self.level_ranks.items()) 
             if lvl > level
