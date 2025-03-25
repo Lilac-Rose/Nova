@@ -17,7 +17,6 @@ class XPTracker(commands.Cog):
                     "SELECT last_message_time FROM cooldowns WHERE user_id = ?",
                     (str(user_id),)
                 )
-
                 row = await cur.fetchone()
                 current_time = time.time()
                 
@@ -27,10 +26,31 @@ class XPTracker(commands.Cog):
                 await cur.execute(
                     """INSERT OR REPLACE INTO cooldowns 
                     VALUES (?, ?)""",
-                    (str(user_id), current_time)
-                )
+                    (str(user_id), current_time))
                 await conn.commit()
                 return False
+
+    async def _grant_level_up_rewards(self, conn, user_id: str, new_level: int):
+        """Grant coins and update ranks when leveling up"""
+        async with conn.cursor() as cur:
+            # Grant bonus coins (100 per level)
+            bonus = 100 * new_level
+            await cur.execute(
+                """INSERT INTO user_coins (user_id, coins)
+                VALUES (?, ?)
+                ON CONFLICT(user_id) DO UPDATE SET
+                coins = coins + excluded.coins""",
+                (user_id, bonus))
+            
+            # Update level ranks via RankSystem cog
+            if rank_cog := self.bot.get_cog("RankSystem"):
+                await cur.execute(
+                    "SELECT xp FROM user_xp WHERE user_id = ?",
+                    (user_id,))
+                xp = (await cur.fetchone())[0]
+                await rank_cog._ensure_level_ranks(user_id, xp)
+            
+            await conn.commit()
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -49,7 +69,16 @@ class XPTracker(commands.Cog):
                 
                 if leveled_up:
                     level = calculate_level(new_xp)[0]
-                    # Optional level up notification here
+                    await self._grant_level_up_rewards(conn, str(message.author.id), level)
+                    
+                    # Optional level up notification
+                    channel = message.channel
+                    try:
+                        await channel.send(
+                            f"🎉 {message.author.mention} leveled up to **level {level}**!",
+                            delete_after=10)
+                    except discord.Forbidden:
+                        pass
                     
         except Exception as e:
             await self.bot.logger.log(

@@ -60,6 +60,16 @@ async def init_db(db_path: str):
                     coins INTEGER DEFAULT 0
                 )
             """)
+
+            await cur.execute("""
+                CREATE TABLE IF NOT EXISTS user_ranks (
+                    user_id TEXT,
+                    rank_name TEXT,
+                    rank_type TEXT,  -- 'level' or 'purchased'
+                    is_equipped INTEGER DEFAULT 0,
+                    PRIMARY KEY (user_id, rank_name, rank_type)
+                )
+            """)
             
             await cur.execute("""
                 CREATE TABLE IF NOT EXISTS cooldowns (
@@ -68,7 +78,6 @@ async def init_db(db_path: str):
                 )
             """)
             
-            # Create blacklist table with all columns
             await cur.execute("""
                 CREATE TABLE IF NOT EXISTS blacklist (
                     user_id TEXT PRIMARY KEY,
