@@ -13,6 +13,7 @@ class XP(commands.Cog):
         try:
             async with await get_connection() as conn:
                 async with conn.cursor() as cur:
+                    # First try to get existing stats
                     await cur.execute('''
                         SELECT ux.xp, uc.coins
                         FROM user_xp ux
@@ -22,9 +23,9 @@ class XP(commands.Cog):
                     result = await cur.fetchone()
                     
                     if result is None:
-                        # Initialize user if not found
+                        # Initialize user stats if not found (using INSERT OR IGNORE)
                         await cur.execute('''
-                            INSERT INTO user_xp (server_id, user_id, xp)
+                            INSERT OR IGNORE INTO user_xp (server_id, user_id, xp)
                             VALUES (?, ?, 0)
                         ''', (server_id, user_id))
                         await cur.execute('''
@@ -57,7 +58,7 @@ class XP(commands.Cog):
         )
         embed.add_field(name="Level", value=str(level))
         embed.add_field(name="XP Progress", value=f"{current_xp}/{next_level_xp} ({progress}%)")
-        embed.add_field(name="Coins", value=f"{coins}")
+        embed.add_field(name="Coins", value=f"{coins:,}")  # Added comma formatting
         embed.set_thumbnail(url=target.display_avatar.url)
         
         await ctx.send(embed=embed)
