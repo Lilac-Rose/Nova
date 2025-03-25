@@ -1,9 +1,8 @@
-# utils/xp.py
 import random
 from typing import Tuple
 
-# Configuration (adjust these as needed)
-XP_PER_MESSAGE = (5, 10)  # min, max
+# Configuration
+XP_PER_MESSAGE = (5, 15)  # min, max
 BASE_XP_NEEDED = 100
 XP_MULTIPLIER = 1.2
 LEVEL_UP_BONUS = 100
@@ -35,20 +34,15 @@ async def add_xp(db, user_id: str, server_id: str) -> Tuple[int, bool]:
         async with conn.cursor() as cur:
             # Update XP
             await cur.execute(
-                """INSERT INTO user_xp (server_id, user_id, xp, last_message_time)
-                VALUES (?, ?, ?, strftime('%s','now'))
+                """INSERT INTO user_xp (server_id, user_id, xp)
+                VALUES (?, ?, ?)
                 ON CONFLICT(server_id, user_id) DO UPDATE SET
-                xp = xp + excluded.xp,
-                last_message_time = excluded.last_message_time
-                WHERE strftime('%s','now') - last_message_time > 10
+                xp = xp + excluded.xp
                 RETURNING xp""",
                 (server_id, user_id, xp_gain)
             )
             
             result = await cur.fetchone()
-            if not result:  # Cooldown active
-                return (0, False)
-            
             new_xp = result[0]
             
             # Update coins

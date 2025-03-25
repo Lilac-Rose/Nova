@@ -50,7 +50,7 @@ class XP(commands.Cog):
         )
         embed.add_field(name="Level", value=str(level))
         embed.add_field(name="XP Progress", value=f"{current_xp}/{next_level_xp} ({progress}%)")
-        embed.add_field(name="Nova Coins", value=f"{coins} 💰")
+        embed.add_field(name="Nova Coins", value=f"{coins}")
         embed.set_thumbnail(url=target.display_avatar.url)
         
         await ctx.send(embed=embed)

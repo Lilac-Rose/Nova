@@ -6,7 +6,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from config import pronouns, status
 from utils.logger import BotLogger
-from utils.database import init_db
+from utils.database import init_db, close_pool
 
 load_dotenv()
 
@@ -19,43 +19,52 @@ class MyBot(commands.Bot):
         signal.signal(signal.SIGTERM, self.handle_signal)
 
     def handle_signal(self, signum, frame):
-        self._restart_requested = signum == signal.SIGTERM
+        self._restart_requested = True
         if self.logger:
             self.logger.set_restart(True)
 
-    async def setup_hook(self):
-        # Initialize logger with your channel ID
-        self.logger = BotLogger(self, log_channel_id=1353840766694457454)
+    async def load_extensions(self):
+        """Load all Python files in commands, events, and tasks folders"""
+        folders = ["commands", "events", "tasks"]
+        loaded = 0
+        failed = 0
         
-        # Verify bot can access the channel
-        try:
-            channel = await self.fetch_channel(1353840766694457454)
-            await self.logger.log("Bot starting up...", level="startup")
-        except discord.Forbidden:
-            print("ERROR: Bot doesn't have permissions to access the logging channel!")
-        except discord.NotFound:
-            print("ERROR: Logging channel not found!")
-        except Exception as e:
-            print(f"Error verifying logging channel: {e}")
-
-        # Initialize database
-        self.db = await init_db("data/nova.db")
-        
-        # Load extensions
-        await self.load_extension("events.error_handler")
-        for folder in ["commands", "events", "tasks"]:
-            for filename in os.listdir(f"./{folder}"):
+        for folder in folders:
+            if not os.path.exists(folder):
+                continue
+                
+            for filename in os.listdir(folder):
                 if filename.endswith(".py") and not filename.startswith("_"):
                     ext_name = f"{folder}.{filename[:-3]}"
                     try:
                         await self.load_extension(ext_name)
+                        loaded += 1
                     except Exception as e:
+                        failed += 1
                         await self.logger.log(
                             f"Failed to load {ext_name}: {type(e).__name__}: {e}",
                             level="error"
                         )
         
-        # Final startup message
+        return loaded, failed
+
+    async def setup_hook(self):
+        # Initialize logger
+        self.logger = BotLogger(self, log_channel_id=1353840766694457454)
+        
+        # Initialize database
+        try:
+            self.db = await init_db("data/nova.db")
+            await self.logger.log("Database initialized", level="info")
+        except Exception as e:
+            await self.logger.log(f"Database init failed: {e}", level="error", alert=True)
+            raise
+
+        # Load extensions
+        loaded, failed = await self.load_extensions()
+        await self.logger.log(f"Loaded {loaded} extensions successfully", level="info")
+        
+        # Startup message
         startup_msg = (
             f"**Bot {'restarted' if self._restart_requested else 'started'}**\n"
             f"• User: {self.user}\n"
@@ -64,8 +73,6 @@ class MyBot(commands.Bot):
         )
         await self.logger.log(startup_msg, level="startup")
         self._restart_requested = False
-        if self.logger:
-            self.logger.set_restart(False)
 
     async def close(self):
         if not self._restart_requested:
@@ -79,18 +86,11 @@ class MyBot(commands.Bot):
                 f"• Guilds: {len(self.guilds)}"
             )
             await self.logger.log(shutdown_msg, level="shutdown")
-        elif self.logger:
+        else:
             await self.logger.log("Bot restarting...", level="restart")
         
-        if self.db:
-            await self.db.close()
+        await close_pool()
         await super().close()
-
-    def restart(self):
-        self._restart_requested = True
-        if self.logger:
-            self.logger.set_restart(True)
-        super().close()
 
 # Configure intents
 intents = discord.Intents.default()
@@ -98,6 +98,7 @@ intents.messages = True
 intents.message_content = True
 intents.members = True
 intents.guilds = True
+intents.reactions = True
 
 bot = MyBot(
     command_prefix="!",
@@ -107,6 +108,15 @@ bot = MyBot(
         name=f"{status} | Pronouns: {pronouns}"
     )
 )
+
+@bot.event
+async def on_ready():
+    await bot.change_presence(
+        activity=discord.Activity(
+            type=discord.ActivityType.watching,
+            name=f"{status} | Pronouns: {pronouns}"
+        )
+    )
 
 if __name__ == "__main__":
     bot.run(os.getenv('TOKEN'))
