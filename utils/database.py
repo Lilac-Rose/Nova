@@ -61,8 +61,8 @@ async def init_db(db_path: str):
     return _pool
 
 async def close_pool():
-    """Close the database connection pool"""
+    """Safely close all connections"""
     global _pool
-    if _pool is not None:
+    if _pool and not _pool._closed:
         await _pool.close()
-        _pool = None
+    _pool = None

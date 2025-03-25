@@ -3,6 +3,7 @@ from discord.ext import commands
 from discord import app_commands
 import logging
 import os
+from utils.database import close_pool, init_db
 
 log = logging.getLogger('nova')
 
@@ -17,62 +18,71 @@ class SystemCommands(commands.Cog):
     @commands.hybrid_command(name="reload_commands")
     @app_commands.check(is_owner)
     async def reload_commands(self, ctx: commands.Context):
-        """Reload ALL bot extensions (commands + events + tasks) without restarting (Owner only)"""
+        """Reload ALL extensions (commands + events + tasks) safely"""
         try:
-            # Get current extensions
+            # Close existing connections
+            await close_pool()
+            
+            # Reload all extensions
             extensions = list(self.bot.extensions.keys())
             success = []
             failed = []
             
-            # Reload everything
             for ext in extensions:
                 try:
                     await self.bot.reload_extension(ext)
-                    category = ext.split('.')[0]  # Get folder name
-                    success.append(category)
+                    success.append(ext.split('.')[0])  # Get category name
                 except Exception as e:
                     failed.append(f"{ext}: {str(e)}")
             
-            # Build result message
+            # Reinitialize database
+            self.bot.db = await init_db("data/nova.db")
+            
+            # Build response
             message = "🔄 Reload Results:\n"
             if success:
-                unique_categories = set(success)
-                message += f"✅ Reloaded {len(success)} extensions across {len(unique_categories)} categories: {', '.join(unique_categories)}\n"
+                message += f"✅ {len(success)} extensions in {len(set(success))} categories\n"
             if failed:
-                message += f"❌ Failed {len(failed)}:\n```{'\n'.join(failed)}```"
+                message += f"❌ Failed: {len(failed)}\n```{'\n'.join(failed)}```"
             
             await ctx.send(message, ephemeral=True)
-            log.info(f"Reloaded {len(success)} extensions, failed {len(failed)}")
+            log.info(f"Reloaded {len(success)} extensions")
 
         except Exception as e:
-            await ctx.send(f"💥 Critical reload error: {str(e)}", ephemeral=True)
-            log.error(f"Full reload failed: {e}")
+            await ctx.send(f"💥 Critical error: {str(e)}", ephemeral=True)
+            log.error(f"Reload failed: {e}")
+            
+            # Emergency reconnect
+            try:
+                self.bot.db = await init_db("data/nova.db")
+            except Exception as db_error:
+                log.critical(f"Database reconnect failed: {db_error}")
 
     @commands.hybrid_command(name="announce")
     @commands.is_owner()
     async def make_announcement(self, ctx, *, message):
-        """Send an announcement to the log channel (Owner only)"""
+        """Send an announcement to the log channel"""
         try:
             channel = self.bot.get_channel(1353840766694457454)
             if channel:
                 await channel.send(f"📣 **Announcement**: {message}")
-                await ctx.send("✅ Announcement posted to log channel")
+                await ctx.send("✅ Announcement posted", ephemeral=True)
             else:
-                await ctx.send("❌ Log channel not found")
+                await ctx.send("❌ Log channel not found", ephemeral=True)
         except Exception as e:
-            await ctx.send(f"❌ Failed to send announcement: {e}")
+            await ctx.send(f"❌ Failed: {e}", ephemeral=True)
             log.error(f"Announcement failed: {e}")
 
     @commands.hybrid_command(name="logs")
     @commands.is_owner()
     async def get_logs(self, ctx, lines: int = 20):
-        """Get recent logs (Owner only)"""
+        """Get recent logs"""
         try:
             with open("logs/bot.log", "r") as f:
                 log_lines = f.readlines()[-lines:]
-            await ctx.send(f"```\n{''.join(log_lines)}\n```")
+            await ctx.send(f"```\n{''.join(log_lines)}\n```", ephemeral=True)
         except Exception as e:
-            await ctx.send(f"❌ Error getting logs: {e}")
+            await ctx.send(f"❌ Error: {e}", ephemeral=True)
             log.error(f"Log retrieval failed: {e}")
 
 async def setup(bot):
