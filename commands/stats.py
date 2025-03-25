@@ -5,7 +5,7 @@ from typing import Optional
 from utils.database import get_connection
 from utils.xp import calculate_level, xp_for_next_level
 
-class XP(commands.Cog):
+class Stats(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.level_ranks = {
@@ -139,4 +139,4 @@ class XP(commands.Cog):
         await ctx.send(embed=embed)
 
 async def setup(bot):
-    await bot.add_cog(XP(bot))
+    await bot.add_cog(Stats(bot))
