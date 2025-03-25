@@ -1,16 +1,18 @@
 import discord
+import random
+import logging
 from discord.ext import commands
 from discord import app_commands
-import logging
-import os
-from utils.database import close_pool, init_db
+from typing import Optional
+from utils.database import init_db, close_pool
+
 
 log = logging.getLogger('nova')
 
 class SystemCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.owner_id = 252130669919076352  # Your Discord ID
+        self.owner_id = 252130669919076352
 
     async def is_owner(self, interaction: discord.Interaction) -> bool:
         return interaction.user.id == self.owner_id
@@ -20,10 +22,8 @@ class SystemCommands(commands.Cog):
     async def reload_commands(self, ctx: commands.Context):
         """Reload ALL extensions (commands + events + tasks) safely"""
         try:
-            # Close existing connections
             await close_pool()
             
-            # Reload all extensions
             extensions = list(self.bot.extensions.keys())
             success = []
             failed = []
@@ -31,14 +31,12 @@ class SystemCommands(commands.Cog):
             for ext in extensions:
                 try:
                     await self.bot.reload_extension(ext)
-                    success.append(ext.split('.')[0])  # Get category name
+                    success.append(ext.split('.')[0])
                 except Exception as e:
                     failed.append(f"{ext}: {str(e)}")
             
-            # Reinitialize database
-            self.bot.db = await init_db("data/nova.db")
+            self.bot.db_pool = await init_db("data/nova.db")
             
-            # Build response
             message = "🔄 Reload Results:\n"
             if success:
                 message += f"✅ {len(success)} extensions in {len(set(success))} categories\n"
@@ -52,9 +50,8 @@ class SystemCommands(commands.Cog):
             await ctx.send(f"💥 Critical error: {str(e)}", ephemeral=True)
             log.error(f"Reload failed: {e}")
             
-            # Emergency reconnect
             try:
-                self.bot.db = await init_db("data/nova.db")
+                self.bot.db_pool = await init_db("data/nova.db")
             except Exception as db_error:
                 log.critical(f"Database reconnect failed: {db_error}")
 
@@ -84,6 +81,121 @@ class SystemCommands(commands.Cog):
         except Exception as e:
             await ctx.send(f"❌ Error: {e}", ephemeral=True)
             log.error(f"Log retrieval failed: {e}")
+
+    @commands.hybrid_command(name="blacklist")
+    @app_commands.check(is_owner)
+    async def blacklist_user(self, ctx, user: discord.User, *, reason: Optional[str] = None):
+        """Add a user to the bot blacklist"""
+        try:
+            await self.bot.add_to_blacklist(user.id)
+            
+            async with self.bot.db_pool.acquire() as conn:
+                async with conn.cursor() as cur:
+                    await cur.execute(
+                        """INSERT INTO blacklist (user_id, reason, created_at) 
+                        VALUES (?, ?, datetime('now'))""",
+                        (str(user.id), reason or "No reason provided")
+                    )
+                    await conn.commit()
+            
+            log_msg = f"Blacklisted {user} ({user.id})"
+            if reason:
+                log_msg += f" | Reason: {reason}"
+                
+            await ctx.send(f"✅ Successfully blacklisted {user.mention}", ephemeral=True)
+            await self.bot.logger.log(log_msg, level="moderation")
+            
+        except Exception as e:
+            await ctx.send(f"❌ Failed to blacklist: {str(e)}", ephemeral=True)
+            log.error(f"Blacklist error: {e}", exc_info=True)
+
+    @commands.hybrid_command(name="unblacklist")
+    @app_commands.check(is_owner)
+    async def unblacklist_user(self, ctx, user: discord.User):
+        """Remove a user from the blacklist"""
+        try:
+            await self.bot.remove_from_blacklist(user.id)
+            
+            async with self.bot.db_pool.acquire() as conn:
+                async with conn.cursor() as cur:
+                    await cur.execute(
+                        "DELETE FROM blacklist WHERE user_id = ?",
+                        (str(user.id),)
+                    )
+                    await conn.commit()
+            
+            await ctx.send(f"✅ Successfully unblacklisted {user.mention}", ephemeral=True)
+            await self.bot.logger.log(
+                f"Unblacklisted {user} ({user.id})", 
+                level="moderation"
+            )
+                
+        except Exception as e:
+            await ctx.send(f"❌ Failed to unblacklist: {str(e)}", ephemeral=True)
+            log.error(f"Unblacklist error: {e}", exc_info=True)
+
+    @commands.hybrid_command(name="blacklist_info")
+    @app_commands.check(is_owner)
+    async def blacklist_info(self, ctx, user: Optional[discord.User] = None):
+        """View blacklist information"""
+        try:
+            async with self.bot.db_pool.acquire() as conn:
+                async with conn.cursor() as cur:
+                    if user:
+                        await cur.execute(
+                            """SELECT reason, created_at 
+                            FROM blacklist 
+                            WHERE user_id = ?""",
+                            (str(user.id),)
+                        )
+                        row = await cur.fetchone()
+                        
+                        if row:
+                            reason, created_at = row
+                            embed = discord.Embed(
+                                title=f"Blacklist Info for {user}",
+                                color=discord.Color.red()
+                            )
+                            embed.add_field(name="User ID", value=user.id, inline=False)
+                            embed.add_field(name="Reason", value=reason or "Not specified", inline=False)
+                            embed.add_field(name="Blacklisted Since", value=created_at, inline=False)
+                        else:
+                            embed = discord.Embed(
+                                title="Not Blacklisted",
+                                description=f"{user} is not in the blacklist",
+                                color=discord.Color.green()
+                            )
+                        await ctx.send(embed=embed, ephemeral=True)
+                    else:
+                        await cur.execute(
+                            """SELECT user_id, reason, created_at 
+                            FROM blacklist 
+                            ORDER BY created_at DESC"""
+                        )
+                        rows = await cur.fetchall()
+                        
+                        if not rows:
+                            return await ctx.send("No users are currently blacklisted", ephemeral=True)
+                        
+                        embed = discord.Embed(
+                            title=f"Blacklisted Users ({len(rows)})",
+                            color=discord.Color.orange()
+                        )
+                        
+                        for user_id, reason, created_at in rows:
+                            user = self.bot.get_user(int(user_id))
+                            embed.add_field(
+                                name=f"{user or 'Unknown User'} ({user_id})",
+                                value=f"**Reason:** {reason or 'Not specified'}\n"
+                                      f"**Since:** {created_at}",
+                                inline=False
+                            )
+                        
+                        await ctx.send(embed=embed, ephemeral=True)
+                        
+        except Exception as e:
+            await ctx.send(f"❌ Error retrieving blacklist info: {str(e)}", ephemeral=True)
+            log.error(f"Blacklist info error: {e}", exc_info=True)
 
 async def setup(bot):
     await bot.add_cog(SystemCommands(bot))

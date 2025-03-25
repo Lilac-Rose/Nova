@@ -17,7 +17,22 @@ async def init_db(db_path: str):
     
     async with await get_connection() as conn:
         async with conn.cursor() as cur:
-            # Create sparkles table
+            # First check if old blacklist table exists without created_at
+            await cur.execute("PRAGMA table_info(blacklist)")
+            columns = [col[1] for col in await cur.fetchall()]
+            
+            # If table exists but is missing columns
+            if columns and 'created_at' not in columns:
+                # Create temporary backup
+                await cur.execute("""
+                    CREATE TABLE IF NOT EXISTS blacklist_backup AS 
+                    SELECT * FROM blacklist
+                """)
+                # Drop old table
+                await cur.execute("DROP TABLE IF EXISTS blacklist")
+                await conn.commit()
+
+            # Create all tables with current schema
             await cur.execute("""
                 CREATE TABLE IF NOT EXISTS sparkles (
                     server_id TEXT,
@@ -29,7 +44,6 @@ async def init_db(db_path: str):
                 )
             """)
             
-            # Create XP table (without last_message_time)
             await cur.execute("""
                 CREATE TABLE IF NOT EXISTS user_xp (
                     server_id TEXT,
@@ -40,7 +54,6 @@ async def init_db(db_path: str):
                 )
             """)
             
-            # Create coins table
             await cur.execute("""
                 CREATE TABLE IF NOT EXISTS user_coins (
                     user_id TEXT PRIMARY KEY,
@@ -48,7 +61,6 @@ async def init_db(db_path: str):
                 )
             """)
             
-            # Create cooldowns table
             await cur.execute("""
                 CREATE TABLE IF NOT EXISTS cooldowns (
                     user_id TEXT PRIMARY KEY,
@@ -56,7 +68,14 @@ async def init_db(db_path: str):
                 )
             """)
             
-            await conn.commit()
+            # Create blacklist table with all columns
+            await cur.execute("""
+                CREATE TABLE IF NOT EXISTS blacklist (
+                    user_id TEXT PRIMARY KEY,
+                    reason TEXT,
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
     
     return _pool
 

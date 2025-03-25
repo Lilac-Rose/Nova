@@ -22,38 +22,39 @@ class XPTracker(commands.Cog):
                 current_time = time.time()
                 
                 if row and current_time - row[0] < self.cooldown_seconds:
-                    return True  # On cooldown
+                    return True
                 
-                # Update cooldown
                 await cur.execute(
                     """INSERT OR REPLACE INTO cooldowns 
                     VALUES (?, ?)""",
                     (str(user_id), current_time)
                 )
                 await conn.commit()
-                return False  # Not on cooldown
+                return False
 
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author.bot or not message.guild:
             return
         
-        # Check cooldown
         if await self.check_cooldown(message.author.id):
             return
             
         try:
-            new_level, leveled_up = await add_xp(
-                self.bot.db,
-                str(message.author.id),
-                str(message.guild.id)
-            )
+            async with await get_connection() as conn:
+                new_xp, leveled_up = await add_xp(
+                    conn,
+                    str(message.author.id),
+                    str(message.guild.id))
                 
+                if leveled_up:
+                    level = calculate_level(new_xp)[0]
+                    # Optional level up notification here
+                    
         except Exception as e:
             await self.bot.logger.log(
                 f"XP error: {type(e).__name__}: {str(e)}",
-                level="error"
-            )
+                level="error")
 
 async def setup(bot):
     await bot.add_cog(XPTracker(bot))
