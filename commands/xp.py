@@ -9,29 +9,45 @@ class XP(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def get_user_data(self, server_id: str, user_id: str):
-        """Safe database access with connection validation"""
+    async def get_user_stats(self, server_id: str, user_id: str):
+        """Get both XP and coins in one query"""
         try:
             async with await get_connection() as conn:
                 async with conn.cursor() as cur:
                     await cur.execute('''
-                        SELECT xp FROM user_xp 
-                        WHERE server_id = ? AND user_id = ?
+                        SELECT ux.xp, uc.coins
+                        FROM user_xp ux
+                        LEFT JOIN user_coins uc ON ux.user_id = uc.user_id
+                        WHERE ux.server_id = ? AND ux.user_id = ?
                     ''', (server_id, user_id))
                     result = await cur.fetchone()
-                    return result[0] if result else 0
+                    
+                    if result is None:
+                        # Initialize user if not found
+                        await cur.execute('''
+                            INSERT INTO user_xp (server_id, user_id, xp)
+                            VALUES (?, ?, 0)
+                        ''', (server_id, user_id))
+                        await cur.execute('''
+                            INSERT OR IGNORE INTO user_coins (user_id, coins)
+                            VALUES (?, 0)
+                        ''', (user_id,))
+                        await conn.commit()
+                        return (0, 0)  # Default XP and coins
+                    
+                    return (result[0], result[1] if result[1] is not None else 0)
         except Exception as e:
             await self.bot.logger.log(
-                f"XP query failed: {str(e)}",
+                f"Stats query failed: {str(e)}",
                 level="error"
             )
-            return 0
+            return (0, 0)  # Fallback values
 
     @commands.hybrid_command(name="xp", description="Check your XP and level")
     @app_commands.describe(user="User to check (optional)")
     async def xp(self, ctx: commands.Context, user: Optional[discord.User] = None):
         target = user or ctx.author
-        xp = await self.get_user_data(str(ctx.guild.id), str(target.id))
+        xp, coins = await self.get_user_stats(str(ctx.guild.id), str(target.id))
         
         level, current_xp = calculate_level(xp)
         next_level_xp = xp_for_next_level(level)
@@ -43,6 +59,7 @@ class XP(commands.Cog):
         )
         embed.add_field(name="Level", value=str(level))
         embed.add_field(name="XP Progress", value=f"{current_xp}/{next_level_xp} ({progress}%)")
+        embed.add_field(name="Coins", value=f"{coins}")
         embed.set_thumbnail(url=target.display_avatar.url)
         
         await ctx.send(embed=embed)
