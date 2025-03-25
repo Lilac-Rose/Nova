@@ -3,7 +3,6 @@ from discord.ext import commands
 from discord import app_commands
 import logging
 import os
-import time
 
 log = logging.getLogger('nova')
 
@@ -18,30 +17,36 @@ class SystemCommands(commands.Cog):
     @commands.hybrid_command(name="reload_commands")
     @app_commands.check(is_owner)
     async def reload_commands(self, ctx: commands.Context):
-        """Reload all bot commands without restarting (Owner only)"""
+        """Reload ALL bot extensions (commands + events + tasks) without restarting (Owner only)"""
         try:
+            # Get current extensions
             extensions = list(self.bot.extensions.keys())
             success = []
             failed = []
             
+            # Reload everything
             for ext in extensions:
                 try:
                     await self.bot.reload_extension(ext)
-                    success.append(ext)
+                    category = ext.split('.')[0]  # Get folder name
+                    success.append(category)
                 except Exception as e:
                     failed.append(f"{ext}: {str(e)}")
             
-            message = "✅ Reload complete!\n"
+            # Build result message
+            message = "🔄 Reload Results:\n"
             if success:
-                message += f"• Reloaded: {len(success)} commands\n"
+                unique_categories = set(success)
+                message += f"✅ Reloaded {len(success)} extensions across {len(unique_categories)} categories: {', '.join(unique_categories)}\n"
             if failed:
-                message += f"• Failed: {', '.join(failed)}"
+                message += f"❌ Failed {len(failed)}:\n```{'\n'.join(failed)}```"
             
             await ctx.send(message, ephemeral=True)
-            log.info(f"Commands reloaded: {len(success)} success, {len(failed)} failed")
+            log.info(f"Reloaded {len(success)} extensions, failed {len(failed)}")
+
         except Exception as e:
-            await ctx.send(f"❌ Critical reload error: {str(e)}", ephemeral=True)
-            log.error(f"Command reload failed: {e}")
+            await ctx.send(f"💥 Critical reload error: {str(e)}", ephemeral=True)
+            log.error(f"Full reload failed: {e}")
 
     @commands.hybrid_command(name="announce")
     @commands.is_owner()
