@@ -33,7 +33,7 @@ class CoinsLeaderboard(commands.Cog):
                     return
                 
                 embed = discord.Embed(
-                    title=f"💰 {escape_markdown(ctx.guild.name)} Nova Coins Leaderboard",
+                    title=f"{escape_markdown(ctx.guild.name)} Nova Coins Leaderboard",
                     color=discord.Color.green())
                 
                 for rank, (user_id, coins) in enumerate(results, 1):

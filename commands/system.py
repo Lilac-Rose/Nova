@@ -17,6 +17,12 @@ class SystemCommands(commands.Cog):
     async def is_owner(self, interaction: discord.Interaction) -> bool:
         return interaction.user.id == self.owner_id
 
+    @commands.hybrid_command(name="sync_commands")
+    @app_commands.check(is_owner)
+    async def sync(self, ctx: commands.Context):
+        await ctx.bot.tree.sync()
+        await ctx.send("Slash commands synced!")
+
     @commands.hybrid_command(name="reload_commands")
     @app_commands.check(is_owner)
     async def reload_commands(self, ctx: commands.Context):

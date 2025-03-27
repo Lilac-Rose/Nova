@@ -104,11 +104,6 @@ class MyBot(commands.Bot):
         await close_pool()
         await super().close()
 
-@commands.command()
-async def sync(ctx):
-    await ctx.bot.tree.sync()
-    await ctx.send("Slash commands synced!")
-
 intents = discord.Intents.default()
 intents.messages = True
 intents.message_content = True
@@ -122,8 +117,6 @@ bot = MyBot(
         name=f"{status} | Pronouns: {pronouns}"
     )
 )
-
-bot.add_command(sync)
 
 if __name__ == "__main__":
     bot.run(os.getenv('TOKEN'))
