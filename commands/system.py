@@ -6,7 +6,6 @@ from discord import app_commands
 from typing import Optional
 from utils.database import init_db, close_pool
 
-
 log = logging.getLogger('nova')
 
 class SystemCommands(commands.Cog):

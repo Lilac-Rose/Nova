@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 import logging
 
-# Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
@@ -14,7 +13,6 @@ class SendMessage(commands.Cog):
 
     @commands.command(hidden=True)
     async def send_message(self, ctx, server_id: int, channel_id: int, message_id: str, *, message_content: str):
-        # Log command usage
         logger.info(f"Command 'send_message' invoked by {ctx.author} (ID: {ctx.author.id}) with server_id={server_id}, channel_id={channel_id}, message_content='{message_content}'")
 
         if ctx.author.id != MY_USER_ID:
@@ -23,7 +21,6 @@ class SendMessage(commands.Cog):
             logger.warning(f"Permission denied for {ctx.author} (ID: {ctx.author.id})")
             return
 
-        # Find the server
         server = self.bot.get_guild(server_id)
         if server is None:
             feedback = "Server not found."
@@ -31,7 +28,6 @@ class SendMessage(commands.Cog):
             logger.error(f"Server not found: server_id={server_id}")
             return
 
-        # Find the channel
         channel = server.get_channel(channel_id)
         if channel is None:
             feedback = "Channel not found."
