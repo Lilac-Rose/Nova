@@ -104,7 +104,7 @@ class RankSystem(commands.Cog):
                 xp = xp_result[0] if xp_result else 0
                 level = self._calculate_level_from_xp(xp)
                 
-                # Get all owned ranks
+                # Get all owned ranks and equipped status
                 await cur.execute('''
                     SELECT rank_name, is_equipped, rank_type FROM user_ranks
                     WHERE user_id = ?
@@ -117,6 +117,14 @@ class RankSystem(commands.Cog):
                 ''', (str(ctx.author.id),))
                 all_ranks = await cur.fetchall()
                 
+                # Get currently equipped rank
+                await cur.execute('''
+                    SELECT rank_name FROM user_ranks
+                    WHERE user_id = ? AND is_equipped = 1
+                ''', (str(ctx.author.id),))
+                equipped_result = await cur.fetchone()
+                equipped_rank = equipped_result[0] if equipped_result else None
+                
         # Get rank information
         earned_ranks = self.get_all_achieved_level_ranks(level)
         current_rank = self.get_current_level_rank(level)
@@ -128,9 +136,17 @@ class RankSystem(commands.Cog):
             color=discord.Color.purple()
         )
         
-        # Current Rank
+        # Current Equipped Rank
+        if equipped_rank:
+            embed.add_field(
+                name="⭐ Currently Equipped",
+                value=f"{equipped_rank.title()}",
+                inline=False
+            )
+        
+        # Current Level Rank
         embed.add_field(
-            name="🌟 Current Rank",
+            name="🌟 Current Level Rank",
             value=f"{current_rank} (Level {level})",
             inline=False
         )
@@ -157,7 +173,7 @@ class RankSystem(commands.Cog):
         if purchased_ranks:
             ranks_list = []
             for rank_name, is_equipped, _ in purchased_ranks:
-                prefix = "⭐ " if is_equipped else ""
+                prefix = "✅ " if is_equipped else "• "
                 ranks_list.append(f"{prefix}{rank_name.title()}")
             
             embed.add_field(
@@ -254,8 +270,7 @@ class RankSystem(commands.Cog):
                     await cur.execute(
                         """INSERT INTO user_ranks (user_id, rank_name, rank_type, is_equipped)
                         VALUES (?, ?, 'purchased', 0)""",
-                        (str(ctx.author.id), rank_name)
-                    )
+                        (str(ctx.author.id), rank_name))
                     
                     await conn.commit()
                 except Exception as e:
@@ -267,7 +282,76 @@ class RankSystem(commands.Cog):
                     raise e
         
         await ctx.send(
-            f"🎉 Successfully purchased `{rank_name}` rank for {price:,} coins!",
+            f"🎉 Successfully purchased `{rank_name}` rank for {price:,} coins!\n"
+            f"Use `/equiprank {rank_name}` to display this rank!",
+            ephemeral=True
+        )
+
+    @commands.hybrid_command(name="equiprank", description="Equip a purchased rank")
+    @app_commands.describe(rank_name="Name of the rank to equip")
+    async def equip_rank(self, ctx: commands.Context, rank_name: str):
+        """Equip a purchased rank to display it"""
+        rank_name = rank_name.lower()
+        
+        async with await get_connection() as conn:
+            async with conn.cursor() as cur:
+                # Check if user owns the rank
+                await cur.execute(
+                    "SELECT rank_type FROM user_ranks WHERE user_id = ? AND rank_name = ?",
+                    (str(ctx.author.id), rank_name))
+                rank_data = await cur.fetchone()
+                
+                if not rank_data:
+                    return await ctx.send(
+                        f"You don't own the `{rank_name}` rank! Purchase it first with `/buyrank`.",
+                        ephemeral=True
+                    )
+                
+                rank_type = rank_data[0]
+                
+                # Unequip all other ranks first (only one can be equipped at a time)
+                await cur.execute(
+                    "UPDATE user_ranks SET is_equipped = 0 WHERE user_id = ?",
+                    (str(ctx.author.id),))
+                
+                # Equip the selected rank
+                await cur.execute(
+                    "UPDATE user_ranks SET is_equipped = 1 WHERE user_id = ? AND rank_name = ?",
+                    (str(ctx.author.id), rank_name))
+                
+                await conn.commit()
+        
+        await ctx.send(
+            f"✨ You've equipped the `{rank_name}` rank! It will now be displayed on your profile.",
+            ephemeral=True
+        )
+
+    @commands.hybrid_command(name="unequiprank", description="Unequip your current rank")
+    async def unequip_rank(self, ctx: commands.Context):
+        """Remove your currently equipped rank"""
+        async with await get_connection() as conn:
+            async with conn.cursor() as cur:
+                # Check if user has any rank equipped
+                await cur.execute(
+                    "SELECT rank_name FROM user_ranks WHERE user_id = ? AND is_equipped = 1",
+                    (str(ctx.author.id),))
+                equipped_rank = await cur.fetchone()
+                
+                if not equipped_rank:
+                    return await ctx.send(
+                        "You don't have any rank equipped!",
+                        ephemeral=True
+                    )
+                
+                # Unequip the rank
+                await cur.execute(
+                    "UPDATE user_ranks SET is_equipped = 0 WHERE user_id = ?",
+                    (str(ctx.author.id),))
+                
+                await conn.commit()
+        
+        await ctx.send(
+            f"✅ You've unequipped your rank. Your level rank will now be displayed.",
             ephemeral=True
         )
 
