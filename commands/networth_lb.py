@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 from discord.utils import escape_markdown
-from typing import Tuple  # Add this import
+from typing import Tuple
 
 class NetWorthLeaderboard(commands.Cog):
     def __init__(self, bot):
@@ -24,7 +24,6 @@ class NetWorthLeaderboard(commands.Cog):
     async def calculate_net_worth(self, user_id: str, conn) -> Tuple[int, int, int]:
         """Calculate a user's total net worth and components"""
         async with conn.cursor() as cur:
-            # Get coins balance
             await cur.execute(
                 "SELECT coins FROM user_coins WHERE user_id = ?",
                 (user_id,)
@@ -32,7 +31,6 @@ class NetWorthLeaderboard(commands.Cog):
             coins_result = await cur.fetchone()
             coins = coins_result[0] if coins_result else 0
             
-            # Get purchased ranks and sum their values
             await cur.execute(
                 "SELECT rank_name FROM user_ranks WHERE user_id = ? AND rank_type = 'purchased'",
                 (user_id,)
@@ -55,13 +53,11 @@ class NetWorthLeaderboard(commands.Cog):
             return
             
         async with self.bot.db_pool.acquire() as conn:
-            # Calculate net worth for all members
             member_data = []
             for user_id in guild_member_ids:
                 net_worth, coins, rank_value = await self.calculate_net_worth(user_id, conn)
                 member_data.append((user_id, net_worth, coins, rank_value))
             
-            # Sort by net worth (descending) and take top results
             member_data.sort(key=lambda x: x[1], reverse=True)
             top_results = member_data[:limit]
                 
@@ -73,7 +69,6 @@ class NetWorthLeaderboard(commands.Cog):
                 title=f"{escape_markdown(ctx.guild.name)} Net Worth Leaderboard",
                 color=discord.Color.gold())
             
-            # Add #1 with breakdown
             user_id, net_worth, coins, rank_value = top_results[0]
             user = ctx.guild.get_member(int(user_id))
             
@@ -89,7 +84,6 @@ class NetWorthLeaderboard(commands.Cog):
                 )
                 embed.set_thumbnail(url=user.display_avatar.url)
             
-            # Add other entries with just total
             for rank, (user_id, net_worth, _, _) in enumerate(top_results[1:], 2):
                 user = ctx.guild.get_member(int(user_id))
                 display_name = escape_markdown(user.display_name) if user else f"Unknown User ({user_id})"
