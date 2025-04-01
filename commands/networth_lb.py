@@ -96,7 +96,7 @@ class NetWorthLeaderboard(commands.Cog):
                 
                 embed.add_field(
                     name=f"{rank}. {display_name}",
-                    value=f"{net_worth:,}",
+                    value=f"Total: {net_worth:,}",
                     inline=False)
             
             embed.set_footer(text="Net worth = coins + value of purchased ranks")
